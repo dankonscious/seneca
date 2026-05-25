@@ -22,7 +22,7 @@ jobs:
     permissions:
       contents: read
       pull-requests: read
-      issues: read
+      issues: write
       id-token: write
       actions: read # Required for Claude to read CI results on PRs
     steps:
@@ -49,7 +49,6 @@ jobs:
             gh pr create --title "Your descriptive title" --body "## Summary
             Your summary of what was implemented.
              
-            Closes #${{ github.event.issue.number }}"
             ```
             Always include a summary of changes AND "Closes #${{ github.event.issue.number }}" in the body.
              
@@ -88,7 +87,7 @@ jobs:
       - name: Clean up Claude comment
         if: github.event_name == 'issues'
         env:
-          GH_TOKEN: ${{ secrets.GH_PAT }}
+          GH_TOKEN: ${{ github.token }}
         run: |
           # Get the latest comment from Claude on this issue
           COMMENT_ID=$(gh api repos/${{ github.repository }}/issues/${{ github.event.issue.number }}/comments --jq '.[-1].id')
