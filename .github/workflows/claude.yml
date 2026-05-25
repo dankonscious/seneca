@@ -50,7 +50,9 @@ jobs:
             Your summary of what was implemented.
              
             ```
-            Always include a summary of changes AND "Closes #${{ github.event.issue.number }}" in the body.
+            Always include a summary of changes in the PR body. 
+            Do NOT include issue numbers or issue references in the PR body. 
+            NEVER modify, close, resolve, or change the status of any issue.
              
             **COMMIT RULES:**
             - Do NOT add "Co-authored-by" lines to commits
