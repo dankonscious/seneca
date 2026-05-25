@@ -29,7 +29,7 @@ jobs:
           title: "${{ github.event.issue.title }}"
           body: "${{ github.event.issue.body }}"
           branch: feature/claude-${{ github.run_id }}
-          commit-message: "Add test page"
+          commit-message: "${{ github.event.issue.title }}"
           delete-branch: true
 
       - name: Comment on issue
