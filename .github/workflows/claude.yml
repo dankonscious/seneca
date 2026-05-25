@@ -4,15 +4,16 @@ on:
   issues:
     types: [labeled]
 
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+  id-token: write   # ✅ REQUIRED FIX
+
 jobs:
   claude:
     if: github.event.label.name == 'claude'
     runs-on: ubuntu-latest
-
-    permissions:
-      contents: write
-      pull-requests: write
-      issues: write
 
     steps:
       - uses: actions/checkout@v4
