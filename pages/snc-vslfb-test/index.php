@@ -3,10 +3,10 @@
     $qs = ($_SERVER["QUERY_STRING"] ? "?" : "") . $_SERVER["QUERY_STRING"];
     require_once("../../splittester/splittester.class.php");
     $urls = array(
-      "../snc-vslfb-test-dup/$qs",
-      "../snc-vslfb-test-v1/$qs",
-      "../snc-vslfb-test-v2/$qs",
-      "../snc-vslfb-test-v1/$qs",
+      "https://senecahealthads.com/pages/snc-vslfb-test-dup/$qs",
+      "https://senecahealthads.com/pages/snc-vslfb-test-v1/$qs",
+      "https://senecahealthads.com/pages/snc-vslfb-test-v2/$qs",
+      "https://senecahealthads.com/pages/snc-vslfb-test-v1/$qs",
     );
     $split = new SplitTester($urls);
   }
