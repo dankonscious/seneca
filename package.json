@@ -1,0 +1,26 @@
+{
+  "name": "perfectdigestion.com",
+  "version": "1.0.0",
+  "description": "This repository contains an automated deployment and asset optimization workflow powered by **GitHub Actions**. The workflow simplifies deployment and asset handling by automatically processing images and uploading them to the correct infrastructure.",
+  "main": "tailwind.config.js",
+  "scripts": {
+    "encdev": "node build-tailwind.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KonsciousLLC/perfectdigestion.com.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/KonsciousLLC/perfectdigestion.com/issues"
+  },
+  "homepage": "https://github.com/KonsciousLLC/perfectdigestion.com#readme",
+  "devDependencies": {
+    "concurrently": "^9.2.1",
+    "tailwindcss": "^3.4.19"
+  },
+  "dependencies": {
+    "sharp": "^0.34.5"
+  }
+}
