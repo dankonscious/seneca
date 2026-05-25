@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page Title</title>
+    <link rel="icon" type="image/png" href="/images/favicon.svg">
+    <link rel="stylesheet" href="/css/tailwind.output.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- Load Optimized Script -->
+    <script src="https://d3j6ngx7p7lglj.cloudfront.net/global/js/kk.main.min.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        // ✅ Run initialization on page load
+        if (scriptLoader) {
+          scriptLoader.disableScripts = ['wistia'];
+          scriptLoader.loadAllScripts([
+            scriptLoader.loadGTM('GTM-56TX85F'),
+            scriptLoader.loadGA(['AW-770742054']),
+          ]);
+        }
+      });
+    </script>
+    <script src="https://fast.wistia.com/assets/external/E-v1.js" async></script>
+</head>
+<body>
+
+  <!-- HTML CODE BEGIN HERE -->
+
+   
+  <script>
+
+    document.addEventListener("DOMContentLoaded", function () {
+      const toggles = document.querySelectorAll(".faq-toggle");
+
+      toggles.forEach(toggle => {
+        const answer = toggle.querySelector(".faq-answer");
+        const icon = toggle.querySelector("svg");
+
+        toggle.addEventListener("click", () => {
+          const isOpen = !answer.classList.contains("enc-hidden");
+
+          
+          document.querySelectorAll(".faq-answer").forEach(a => a.classList.add("enc-hidden"));
+          document.querySelectorAll(".faq-toggle svg").forEach(s => s.classList.remove("enc-rotate-180"));
+
+          if (!isOpen) {
+            answer.classList.remove("enc-hidden");
+            answer.classList.add("enc-flex");
+            icon.classList.add("enc-rotate-180");
+          }
+        });
+      });
+    });
+
+    const currentYear = new Date().getFullYear();
+    for(let copyright of document.getElementsByClassName('copyright')) {
+      copyright.textContent = copyright.textContent.replace(/\d{4}/, currentYear);
+    }
+
+    function sleep(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    async function hidePreloader() {
+      let preloader = document.getElementById('wistia-preloader');
+      let wistiaContainer = document.querySelector('.wistia-container');
+
+      if (preloader) {
+        await sleep(1000);
+        console.log("Hiding preloader...");
+        preloader.classList.add("enc-hidden");
+        wistiaContainer.removeAttribute("style");
+        wistiaContainer.classList.remove('opacity-0');
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+      if (window.location.hash == "#drop") dropit();
+    });
+
+    var playfirst = true;
+    window.wistiaID = "";
+    let stillUrl = "";
+    var ismobile = false;
+
+    if (window.matchMedia("(max-width: 768px)").matches) {
+      window.wistiaID = "w6xp2xi0y1";
+      ismobile = true;
+    } else {
+      window.wistiaID = "qlnc9i1ry4";
+    }
+
+    let playbar = false;
+    if (window.location.hash == "#videobar") playbar = true;
+
+    document
+      .querySelector(".wistia_embed")
+      .classList.add("wistia_async_" + window.wistiaID);
+
+    var s = document.createElement("script");
+    s.setAttribute(
+      "src",
+      "https://fast.wistia.com/embed/medias/" + window.wistiaID + ".jsonp"
+    );
+    s.setAttribute("id", "mine");
+    s.async = true;
+    s.onload = wistiacallback;
+    document.head.appendChild(s);
+
+    var vincontClasslist = document.querySelector("#vidcont").className;
+
+    function wistiacallback() {
+      window._wq = window._wq || [];
+      _wq.push({
+        id: window.wistiaID,
+        options: {
+          autoPlay: false,
+          playbar: playbar,
+          stillUrl: stillUrl,
+          volumeControl: false,
+          smallPlayButton: false,
+          fullscreenButton: false,
+        },
+        onReady: function (video) {
+          console.log("I got a handle to the video!", video);
+
+          window.video = video;
+
+          video.bind("secondchange", (s) => {
+            if (s >= 38 * 60 + 38 && !document.body.classList.contains("dropped")) {
+              document.body.classList.add("dropped");
+              dropit();
+            }
+          });
+
+          var vidcont = document.querySelector(
+            "#vidcont>div:first-child>div:first-child"
+          );
+
+          if (window.innerWidth <= 767) {
+            let h = window.innerWidth / window.video.aspect();
+            vidcont.style.height = h + "px";
+          }
+
+          if (video.hasData()) {
+            hidePreloader();
+          }
+          const vidcontEl = document.querySelector("#vidcont");
+          video.bind("play", function () {
+            console.log(!ismobile , !document.body.classList.contains("dropped"))
+            if (playfirst === true) {
+              video.time(0);
+              playfirst = false;
+              setTimeout(() => {
+                document.querySelector('.important-text').classList.add("fadeOut");
+              }, 10000)
+            }
+
+            
+            //vidcontEl.className = "";
+            document.body.classList.add("playing");
+            document.body.classList.remove("paused");
+            vidcontEl.querySelector("div:first-child").classList.add("no-max-width");
+            //document.querySelector("#thevid").classList.add("enc-w-full");
+
+            // replace $(".hideonplay").addClass(...)
+            if (!ismobile) {
+              document.querySelectorAll(".hideonplay")
+                .forEach(el => el.classList.add("enc-hidden"));
+            }
+
+            // replace $(".showonplay").removeClass(...)
+            if (!ismobile && !document.body.classList.contains("dropped")) {
+              document.querySelectorAll(".showonplay")
+                .forEach((el) => {
+                  console.log(el);
+                  el.classList.remove("!enc-hidden")
+                });
+            }
+
+            if (window.innerWidth <= 767) {
+              vidcont.style.height = document.querySelector(
+                ".enc-mx-auto.wistia_embed"
+              ).style.height;
+            }
+
+            setTimeout(function () {
+              document.querySelectorAll(".important").forEach(el => {
+                let parent = el.closest("div");
+                if (parent) parent.classList.add("fadeOut");
+              });
+            }, 10000);
+          });
+
+          video.bind("pause", function () {
+            console.log("PAUSED")
+            document.body.classList.remove("playing");
+            vidcontEl.querySelector("div:first-child").classList.remove("no-max-width");
+
+            document.querySelectorAll(".hideonplay")
+              .forEach(el => el.classList.remove("enc-hidden"));
+
+            document.querySelectorAll(".showonplay")
+              .forEach(el => el.classList.add("enc-hidden"));
+
+
+            if (document.body.classList.contains("dropped")) {
+              // vidcontEl.classList.add("vidcont2", "enc-mx-auto");
+            vidcontEl.querySelector("div:first-child").classList.add("enc-mx-auto");
+
+            } else {
+              vidcontEl.className = vincontClasslist;
+            }
+          });
+
+          video.bind("end", function () {
+            document.querySelector("#thevid").classList.remove("enc-w-full");
+
+            document.querySelectorAll(".hideonplay")
+              .forEach(el => el.classList.remove("enc-hidden"));
+
+            document.querySelectorAll(".showonplay")
+              .forEach(el => el.classList.add("enc-hidden"));
+
+            const vidcontEl = document.querySelector("#vidcont");
+
+            if (document.body.classList.contains("dropped")) {
+              vidcontEl.classList.add("vidcont2", "enc-mx-auto");
+            } else {
+              vidcontEl.className = vincontClasslist;
+            }
+          });
+
+          video.bind("widthchange", function () {
+            console.log("The width changed to " + video.width());
+
+            if (video.state() === "playing") {
+              let toHeight = Math.floor(
+                window.innerWidth / window.video.aspect()
+              );
+
+              if (toHeight > window.innerHeight)
+                toHeight = window.innerHeight;
+
+              let toWidth = Math.floor(toHeight * window.video.aspect());
+              window.video.width(toWidth, { constrain: true });
+            }
+          });
+        },
+      });
+    }
+
+    document.addEventListener("keydown", function (event) {
+      if (event.ctrlKey && event.key === "b") {
+        dropit();
+      }
+    });
+
+    
+    (function startDropitTimer() {
+        var TARGET_SECONDS = 2313;
+        if (window.__dropitPageTimerStarted) return;
+        window.__dropitPageTimerStarted = true;
+
+        // make elapsed globally editable
+        window.dropitElapsed = 0;
+        if (window.location.hash.includes("#elapsedtime")) {
+            window.dropitElapsed = window.location.hash.split("elapsedtime=")[1] ? parseInt(window.location.hash.split("elapsedtime=")[1]) : 0;
+        }
+        console.log(window.dropitElapsed);
+        var timer = setInterval(function () {
+            window.dropitElapsed += 1;
+            console.log("Dropit timer: " + window.dropitElapsed + " seconds elapsed");
+            if (window.dropitElapsed >= TARGET_SECONDS) {
+            clearInterval(timer);
+            try {
+                if (typeof dropit === 'function') dropit();
+            } catch (e) {
+                console.error('dropit timer error', e);
+            }
+            }
+        }, 1000);
+    })();
+
+    function dropit() {
+      console.log("DROPPED");
+      
+      document.querySelectorAll(".heading-gap").forEach(el => {
+        el.style.rowGap = "16px";
+      });
+      document.querySelectorAll(".beforedrop")
+
+      document.body.classList.add("dropped");
+
+      document.querySelectorAll(".showonplay")
+        .forEach(el => el.classList.add("enc-hidden"));
+
+      const vidcontEl = document.querySelector("#vidcont");
+      const vidcontEl2 = document.querySelector(".vidcont2");
+      vidcontEl.className = "";
+      vidcontEl2.classList.add("vidcont", "enc-mx-auto");
+
+      document.querySelectorAll(".beforedrop")
+        .forEach(el => el.classList.add("enc-hidden"));
+
+      document.querySelectorAll(".afterdrop")
+        .forEach(el => el.classList.remove("enc-hidden"));
+
+      setTimeout(function () {
+        const el = document.querySelector(".scrolldowntoselect");
+        if (el) el.classList.add("fadeIn");
+      }, 500);
+    }
+  </script>
+  <style>
+    .w-video-wrapper {
+      background: transparent !important;
+    }
+  </style>
+</body>
+</html>
