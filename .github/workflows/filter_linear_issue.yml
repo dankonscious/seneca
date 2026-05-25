@@ -2,28 +2,40 @@ name: Filter Linear Issues
 
 on:
   issues:
-    types: [opened]
+    types: [opened, labeled]
+
+permissions:
+  issues: write
 
 jobs:
   filter:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Close unwanted issues
+      - name: Close non-claude issues
         uses: actions/github-script@v7
         with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const issue = context.payload.issue;
-            const labels = issue.labels.map(l => l.name);
+            const labels = issue.labels.map(l => l.name.toLowerCase());
+
             const hasClaudeLabel = labels.includes("claude");
 
             if (!hasClaudeLabel) {
-              await github.rest.issues.update({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: issue.number,
-                state: "closed"
-              });
 
-              console.log("Issue closed automatically");
+              await github.request(
+                "PATCH /repos/{owner}/{repo}/issues/{issue_number}",
+                {
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issue.number,
+                  state: "closed",
+                  headers: {
+                    "X-GitHub-Api-Version": "2026-03-10"
+                  }
+                }
+              );
+
+              console.log("Closed non-claude issue");
             }
