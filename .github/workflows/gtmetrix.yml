@@ -61,7 +61,7 @@ jobs:
 
             echo "Issue #$ISSUE_NUM mentions 'GTmetrix Score' — proceeding."
 
-            DUPLICATE_URL=$(echo "$ISSUE_BODY" | grep -oiP '(?<=duplicate_url[:\s]\s*)(https?://[^\s]+)' | head -1)
+            DUPLICATE_URL=$(echo "$ISSUE_BODY" | grep -i 'duplicate_url' | grep -oE 'https?://[^[:space:]"]+' | head -1)
 
             if [ -z "$DUPLICATE_URL" ]; then
               DUPLICATE_URL=$(echo "$ISSUE_BODY" | grep -oE 'https?://[^[:space:]"]+' | head -1)
