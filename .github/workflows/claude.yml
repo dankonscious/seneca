@@ -67,6 +67,30 @@ jobs:
             **WHEN FIXING CI FAILURES:**
             Fix the issues, commit the fix. The CI will automatically re-run.
            
+            **WHEN RETURNING GTMETRIX HISTORY RESULT:**
+            
+            1. Read data ONLY from:
+              gtmetrix-history.json
+
+            2. Filter rules:
+              - Include ONLY entries that match the requested URL exactly
+              - Do NOT include any other URLs
+              - Do NOT include partial matches
+
+            3. Output format (STRICT):
+
+            GTMetrix History for: <URL>
+            - <Date> | Grade: <X> | Performance: <X>% | Structure: <X>%
+            - <Date> | Grade: <X> | Performance: <X>% | Structure: <X>%
+
+            4. Output rules:
+              - No extra text
+              - No explanations
+              - No headers besides the title line
+              - No empty lines
+              - No commentary
+              - Keep chronological order (oldest → newest)
+
             **OUTPUT RULES:**
           
             ## Commit Message Requirements (max 72 chars)
