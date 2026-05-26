@@ -1,16 +1,3 @@
-<?php
-  if (@$_GET["test"] != "false") {
-    $qs = ($_SERVER["QUERY_STRING"] ? "?" : "") . $_SERVER["QUERY_STRING"];
-    require_once("../../splittester/splittester.class.php");
-    $urls = array(
-      "https://senecahealthads.com/pages/snc-vslfb-test-dup/$qs",
-      "https://senecahealthads.com/pages/snc-vslfb-test-v2/$qs",
-      "https://senecahealthads.com/pages/snc-vslfb-test-v3/$qs",
-      "https://senecahealthads.com/pages/snc-vslfb-test-v4/$qs",
-    );
-    $split = new SplitTester($urls);
-  }
-?>
 <!DOCTYPE html>
 <html lang="en">
 
