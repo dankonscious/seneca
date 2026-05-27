@@ -57,9 +57,13 @@ jobs:
             exit 0
           fi
 
-          echo "Polling $GTMETRIX_URL until it returns HTTP 200..."
+          echo "Polling $GTMETRIX_URL until it returns HTTP 200 (following redirects)..."
           for i in $(seq 1 30); do
-            STATUS_CODE=$(curl -o /dev/null -s -w "%{http_code}" --max-time 10 "$GTMETRIX_URL")
+            STATUS_CODE=$(node -e "
+              fetch('$GTMETRIX_URL', { method: 'GET', redirect: 'follow' })
+                .then(r => { process.stdout.write(String(r.status)); process.exit(0); })
+                .catch(() => { process.stdout.write('0'); process.exit(0); });
+            ")
             echo "Attempt $i: HTTP $STATUS_CODE"
 
             if [ "$STATUS_CODE" = "200" ]; then
