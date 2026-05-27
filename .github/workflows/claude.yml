@@ -56,6 +56,22 @@ jobs:
             Do NOT include issue numbers or issue references in the PR body. 
             NEVER modify, close, resolve, or change the status of any issue.
              
+            ** GTMETRIX RULES **
+            - Include all the GTmetrix Test URLs in the PR Summary.
+            - Strictly follow the exact output structure provided.
+            - Do NOT rename labels.
+            - Do NOT prepend any variable names, labels, identifiers, or aliases before the URLs (examples: "duplicate_url:", "ref_url:", "test_url:", etc.).
+            - Do NOT add explanations, annotations, or extra formatting.
+            - Only output the raw URLs exactly as provided.
+
+            Use this exact format:
+
+            ## GTMetrix Test URLs
+            - {{url}}
+            - {{url}}
+            - {{url}}
+
+
             **COMMIT RULES:**
             - Do NOT add "Co-authored-by" lines to commits
             - Do NOT add "Generated with Claude Code" or similar attributions
