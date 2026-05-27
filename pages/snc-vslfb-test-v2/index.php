@@ -540,7 +540,7 @@
                 src="https://d3j6ngx7p7lglj.cloudfront.net/perfectdigestion.com/pages/snc-vslfb/images/product-blue-disc.webp"
                 class="">
             </div>
-            <a href="https://go.gutperfection.com/products/seneca-6-pack-snc-vslyt-v2#params"
+            <a href="https://go.gutperfection.com/products/seneca-6-pack-snc-vslyt-v6#params"
               class="enc-w-full enc-mt-4 enc-flex enc-items-center enc-justify-center">
               <img
                 src="https://d3j6ngx7p7lglj.cloudfront.net/perfectdigestion.com/pages/snc-vslfb/images/seneca-cta.webp"
@@ -587,7 +587,7 @@
                 src="https://d3j6ngx7p7lglj.cloudfront.net/perfectdigestion.com/pages/snc-vslfb/images/product-blue-disc.webp"
                 class="">
             </div>
-            <a href="https://go.gutperfection.com/products/seneca-3-pack-snc-vslyt-v2#params"
+            <a href="https://go.gutperfection.com/products/seneca-3-pack-snc-vslyt-v6#params"
               class="enc-w-full enc-mt-4 enc-flex enc-items-center enc-justify-center">
               <img
                 src="https://d3j6ngx7p7lglj.cloudfront.net/perfectdigestion.com/pages/snc-vslfb/images/seneca-cta.webp"
@@ -631,7 +631,7 @@
                 class="enc-font-myriad_pro enc-text-center enc-text-base enc-leading-[100%] enc-font-semibold">Shipping
                 Fee $4.95</span>
             </div>
-            <a href="https://go.gutperfection.com/products/seneca-1-pack-snc-vslyt-v2#params"
+            <a href="https://go.gutperfection.com/products/seneca-1-pack-snc-vslyt-v6#params"
               class="enc-w-full enc-mt-4 enc-flex enc-items-center enc-justify-center">
               <img
                 src="https://d3j6ngx7p7lglj.cloudfront.net/perfectdigestion.com/pages/snc-vslfb/images/seneca-cta.webp"
@@ -1102,7 +1102,7 @@
                 src="https://d3j6ngx7p7lglj.cloudfront.net/perfectdigestion.com/pages/snc-vslfb/images/product-blue-disc.webp"
                 class="">
             </div>
-            <a href="https://go.gutperfection.com/products/seneca-6-pack-snc-vslyt-v2#params"
+            <a href="https://go.gutperfection.com/products/seneca-6-pack-snc-vslyt-v6#params"
               class="enc-w-full enc-mt-4 enc-flex enc-items-center enc-justify-center">
               <img
                 src="https://d3j6ngx7p7lglj.cloudfront.net/perfectdigestion.com/pages/snc-vslfb/images/seneca-cta.webp"
@@ -1150,7 +1150,7 @@
                 src="https://d3j6ngx7p7lglj.cloudfront.net/perfectdigestion.com/pages/snc-vslfb/images/product-blue-disc.webp"
                 class="">
             </div>
-            <a href="https://go.gutperfection.com/products/seneca-3-pack-snc-vslyt-v2#params"
+            <a href="https://go.gutperfection.com/products/seneca-3-pack-snc-vslyt-v6#params"
               class="enc-w-full enc-mt-4 enc-flex enc-items-center enc-justify-center">
               <img
                 src="https://d3j6ngx7p7lglj.cloudfront.net/perfectdigestion.com/pages/snc-vslfb/images/seneca-cta.webp"
@@ -1194,7 +1194,7 @@
                 class="enc-font-myriad_pro enc-text-center enc-text-base enc-leading-[100%] enc-font-semibold">Shipping
                 Fee $4.95</span>
             </div>
-            <a href="https://go.gutperfection.com/products/seneca-1-pack-snc-vslyt-v2#params"
+            <a href="https://go.gutperfection.com/products/seneca-1-pack-snc-vslyt-v6#params"
               class="enc-w-full enc-mt-4 enc-flex enc-items-center enc-justify-center">
               <img
                 src="https://d3j6ngx7p7lglj.cloudfront.net/perfectdigestion.com/pages/snc-vslfb/images/seneca-cta.webp"
