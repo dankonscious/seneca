@@ -48,50 +48,27 @@ jobs:
           echo "=== FINAL: gtmetrix_url='$GTMETRIX_URL' ==="
           echo "gtmetrix_url=$GTMETRIX_URL" >> "$GITHUB_OUTPUT"
 
-      - name: Wait for FTP Deploy to complete
+      - name: Wait for GTmetrix URL to go live
         env:
-          GH_TOKEN: ${{ github.token }}
-          REPO: ${{ github.repository }}
-          MERGE_SHA: ${{ github.event.pull_request.merge_commit_sha || github.sha }}
+          GTMETRIX_URL: ${{ steps.extract_url.outputs.gtmetrix_url }}
         run: |
-          echo "Looking for FTP Deploy run triggered by commit $MERGE_SHA ..."
-
-          # Give GitHub a moment to register the FTP Deploy run
-          sleep 10
-
-          FTP_RUN_ID=""
-          for i in $(seq 1 12); do
-            FTP_RUN_ID=$(gh api "repos/$REPO/actions/workflows/01_ftp_deploy.yml/runs?per_page=10" \
-              --jq ".workflow_runs[] | select(.head_sha == \"$MERGE_SHA\") | .id" | head -1)
-
-            if [ -n "$FTP_RUN_ID" ]; then
-              echo "Found FTP Deploy run: $FTP_RUN_ID"
-              break
-            fi
-
-            echo "Attempt $i: FTP Deploy run not found yet, retrying in 10s..."
-            sleep 10
-          done
-
-          if [ -z "$FTP_RUN_ID" ]; then
-            echo "⚠️  Could not find FTP Deploy run for commit $MERGE_SHA — proceeding anyway."
+          if [ -z "$GTMETRIX_URL" ]; then
+            echo "⚠️  No GTmetrix URL extracted — skipping live check."
             exit 0
           fi
 
-          echo "Waiting for FTP Deploy run $FTP_RUN_ID to complete..."
+          echo "Polling $GTMETRIX_URL until it returns HTTP 200..."
           for i in $(seq 1 30); do
-            STATUS=$(gh api "repos/$REPO/actions/runs/$FTP_RUN_ID" --jq '.status')
-            CONCLUSION=$(gh api "repos/$REPO/actions/runs/$FTP_RUN_ID" --jq '.conclusion // "pending"')
+            STATUS_CODE=$(curl -o /dev/null -s -w "%{http_code}" --max-time 10 "$GTMETRIX_URL")
+            echo "Attempt $i: HTTP $STATUS_CODE"
 
-            echo "Attempt $i: status=$STATUS conclusion=$CONCLUSION"
-
-            if [ "$STATUS" = "completed" ]; then
-              if [ "$CONCLUSION" = "success" ]; then
-                echo "✅ FTP Deploy completed successfully."
-              else
-                echo "⚠️  FTP Deploy finished with conclusion: $CONCLUSION — proceeding anyway."
-              fi
+            if [ "$STATUS_CODE" = "200" ]; then
+              echo "✅ URL is live."
               break
+            fi
+
+            if [ "$i" = "30" ]; then
+              echo "⚠️  URL did not return 200 after 30 attempts — proceeding anyway."
             fi
 
             sleep 20
