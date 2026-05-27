@@ -147,8 +147,6 @@ jobs:
             - Do NOT add "Generated with Claude Code" or any attribution
             - Keep commits clean and professional
 
-          track_progress: true
-
           claude_args: |
             --model "claude-opus-4-5"
             --max-turns 30
