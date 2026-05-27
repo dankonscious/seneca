@@ -42,9 +42,9 @@ jobs:
           echo "=== DEBUG: PR Body ==="
           echo "$PR_BODY"
 
-          # Extract all lines after "## GTmetrix Test URL" that start with http
+          # Extract all URLs after "## GTmetrix Test URL(s)" heading (bare or markdown list items)
           GTMETRIX_URLS=$(echo "$PR_BODY" \
-            | awk '/^## GTmetrix Test URL/{found=1; next} found && /^http/{print} found && !/^http/ && NF{exit}' \
+            | awk '/^## GTmetrix Test URLs?/{found=1; next} found && /https?:\/\//{match($0,/https?:\/\/[^ \t\r\n]+/); print substr($0,RSTART,RLENGTH)} found && !/https?:\/\// && /^##/{exit}' \
             | tr -d '\r')
 
           echo "=== FINAL: gtmetrix_urls ==="
