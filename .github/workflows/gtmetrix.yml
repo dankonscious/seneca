@@ -96,58 +96,57 @@ jobs:
           done <<< "$GTMETRIX_URLS"
 
 
-      - name: Run GTmetrix tests via Claude Code
+      - name: Run GTmetrix tests
         if: steps.extract_url.outputs.gtmetrix_urls != ''
-        id: claude
+        id: run_tests
         env:
           GTMETRIX_API_KEY: ${{ secrets.GTMETRIX_API_KEY }}
-        uses: anthropics/claude-code-action@v1
-        with:
-          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          GTMETRIX_URLS: ${{ steps.extract_url.outputs.gtmetrix_urls }}
+        run: |
+          TMPFILE=$(mktemp)
+          echo "[]" > "$TMPFILE"
 
-          prompt: |
-            Run GTmetrix tests for the following URLs one by one:
+          while IFS= read -r URL; do
+            [ -z "$URL" ] && continue
+            echo "--- Testing: $URL ---"
+            OUTPUT=$(node .github/scripts/gtmetrix.js "$URL" 2>&1 || true)
+            echo "$OUTPUT"
 
-            ${{ steps.extract_url.outputs.gtmetrix_urls }}
+            JSON_ENTRY=$(echo "$OUTPUT" | grep '^RESULT_JSON:' | sed 's/^RESULT_JSON://')
+            if [ -n "$JSON_ENTRY" ]; then
+              echo "$JSON_ENTRY" > /tmp/gtmetrix_entry.json
+              node -e "
+                const fs = require('fs');
+                const arr = JSON.parse(fs.readFileSync('$TMPFILE', 'utf8'));
+                const entry = JSON.parse(fs.readFileSync('/tmp/gtmetrix_entry.json', 'utf8'));
+                arr.push(entry);
+                fs.writeFileSync('$TMPFILE', JSON.stringify(arr, null, 2));
+              "
+            fi
+          done <<< "$GTMETRIX_URLS"
 
-            For each URL:
-            1. Run the test (ignore non-zero exit — performance threshold is informational only):
-               node .github/scripts/gtmetrix.js <url> || true
-            2. Parse the output lines for:
-               - Grade    → line starting with "Grade:"
-               - Performance → line starting with "Performance:"
-               - Structure   → line starting with "Structure:"
+          {
+            echo "test_results<<EOF"
+            cat "$TMPFILE"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
 
-            After all URLs are tested, create or update `gtmetrix-history.json` in the repository root.
+      - name: Update GTmetrix history
+        if: steps.extract_url.outputs.gtmetrix_urls != ''
+        env:
+          TEST_RESULTS: ${{ steps.run_tests.outputs.test_results }}
+        run: |
+          node -e "
+            const fs = require('fs');
+            const histPath = 'gtmetrix-history.json';
+            const existing = fs.existsSync(histPath) ? JSON.parse(fs.readFileSync(histPath, 'utf8')) : [];
+            const newEntries = JSON.parse(process.env.TEST_RESULTS || '[]');
+            fs.writeFileSync(histPath, JSON.stringify([...existing, ...newEntries], null, 2));
+          "
 
-            File format — a JSON array, append one entry per URL tested:
-            [
-              {
-                "url": "<tested_url>",
-                "date": "<YYYY-MM-DD>",
-                "grade": "<grade>",
-                "performance": <number>,
-                "structure": <number>
-              }
-            ]
-
-            If the file does not exist, create it as a new array.
-            If it already exists, read it and append the new entries.
-
-            After writing the file run these git commands exactly:
-            1. git config user.name "enc-action[bot]"
-            2. git config user.email "enc-action[bot]@users.noreply.github.com"
-            3. git add gtmetrix-history.json
-            4. git commit -m "Update GTmetrix history"
-            5. git pull --rebase origin main
-            6. git push
-
-            **COMMIT RULES:**
-            - Do NOT add "Co-authored-by" lines
-            - Do NOT add "Generated with Claude Code" or any attribution
-            - Keep commits clean and professional
-
-          claude_args: |
-            --model "claude-opus-4-5"
-            --max-turns 30
-            --allowedTools "Bash(git:*),Bash(node:*),Edit,Write,Read,Glob,Grep,LS"
+          git config user.name "enc-action[bot]"
+          git config user.email "enc-action[bot]@users.noreply.github.com"
+          git add gtmetrix-history.json
+          git commit -m "Update GTmetrix history" || echo "Nothing to commit"
+          git pull --rebase origin main
+          git push

@@ -107,6 +107,15 @@ async function run() {
       console.log(`Performance: ${attrs.performance_score}`);
       console.log(`Structure: ${attrs.structure_score}`);
 
+      const today = new Date().toISOString().slice(0, 10);
+      console.log("RESULT_JSON:" + JSON.stringify({
+        url: URL,
+        date: today,
+        grade: attrs.grade,
+        performance: attrs.performance_score,
+        structure: attrs.structure_score
+      }));
+
       if (attrs.performance_score < 90) {
         process.exit(1);
       }
