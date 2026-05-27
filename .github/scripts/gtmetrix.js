@@ -66,7 +66,6 @@ async function run() {
         type: "test",
         attributes: {
           url: URL,
-          report: "none",
           video: 0,
           retention: 1
         }
