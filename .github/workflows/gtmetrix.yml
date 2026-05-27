@@ -30,7 +30,7 @@ jobs:
         with:
           fetch-depth: 1
 
-      - name: Extract GTmetrix Test URL from PR body
+      - name: Extract GTmetrix Test URLs from PR body
         id: extract_url
         env:
           GH_TOKEN: ${{ github.token }}
@@ -42,38 +42,55 @@ jobs:
           echo "=== DEBUG: PR Body ==="
           echo "$PR_BODY"
 
-          # Extract the URL on the line immediately after "## GTmetrix Test URL"
-          GTMETRIX_URL=$(echo "$PR_BODY" | grep -A1 '## GTmetrix Test URL' | tail -1 | tr -d '[:space:]')
+          # Extract all lines after "## GTmetrix Test URL" that start with http
+          GTMETRIX_URLS=$(echo "$PR_BODY" \
+            | awk '/^## GTmetrix Test URL/{found=1; next} found && /^http/{print} found && !/^http/ && NF{exit}' \
+            | tr -d '\r')
 
-          echo "=== FINAL: gtmetrix_url='$GTMETRIX_URL' ==="
-          echo "gtmetrix_url=$GTMETRIX_URL" >> "$GITHUB_OUTPUT"
+          echo "=== FINAL: gtmetrix_urls ==="
+          echo "$GTMETRIX_URLS"
 
-      - name: Wait for GTmetrix URL to go live
+          # Store as newline-delimited, encoded for GITHUB_OUTPUT
+          {
+            echo "gtmetrix_urls<<EOF"
+            echo "$GTMETRIX_URLS"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Wait for all GTmetrix URLs to go live
         env:
-          GTMETRIX_URL: ${{ steps.extract_url.outputs.gtmetrix_url }}
+          GTMETRIX_URLS: ${{ steps.extract_url.outputs.gtmetrix_urls }}
         run: |
-          if [ -z "$GTMETRIX_URL" ]; then
-            echo "⚠️  No GTmetrix URL extracted — skipping live check."
+          if [ -z "$GTMETRIX_URLS" ]; then
+            echo "⚠️  No GTmetrix URLs extracted — skipping live check."
             exit 0
           fi
 
-          echo "Polling $GTMETRIX_URL until it returns HTTP 200 (following redirects)..."
-          for i in $(seq 1 30); do
-            STATUS_CODE=$(node -e "
-              fetch('$GTMETRIX_URL', { method: 'GET', redirect: 'follow' })
-                .then(r => { process.stdout.write(String(r.status)); process.exit(0); })
-                .catch(() => { process.stdout.write('0'); process.exit(0); });
-            ")
-            echo "Attempt $i: HTTP $STATUS_CODE"
+          check_url_live() {
+            local URL="$1"
+            echo "--- Polling $URL ---"
+            for i in $(seq 1 30); do
+              STATUS_CODE=$(node -e "
+                fetch('$URL', { method: 'GET', redirect: 'follow' })
+                  .then(r => { process.stdout.write(String(r.status)); process.exit(0); })
+                  .catch(() => { process.stdout.write('0'); process.exit(0); });
+              ")
+              echo "Attempt $i: HTTP $STATUS_CODE"
 
-            if [ "$STATUS_CODE" = "200" ]; then
-              echo "✅ URL is live."
-              break
-            fi
+              if [ "$STATUS_CODE" = "200" ]; then
+                echo "✅ $URL is live."
+                return 0
+              fi
 
-            if [ "$i" = "30" ]; then
-              echo "⚠️  URL did not return 200 after 30 attempts — proceeding anyway."
-            fi
+              if [ "$i" = "30" ]; then
+                echo "⚠️  $URL did not return 200 after 30 attempts — moving on."
+              fi
 
-            sleep 20
-          done
+              sleep 20
+            done
+          }
+
+          while IFS= read -r URL; do
+            [ -z "$URL" ] && continue
+            check_url_live "$URL"
+          done <<< "$GTMETRIX_URLS"
