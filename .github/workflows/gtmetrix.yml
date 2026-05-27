@@ -94,3 +94,62 @@ jobs:
             [ -z "$URL" ] && continue
             check_url_live "$URL"
           done <<< "$GTMETRIX_URLS"
+
+
+      - name: Run GTmetrix tests via Claude Code
+        if: steps.extract_url.outputs.gtmetrix_urls != ''
+        id: claude
+        env:
+          GTMETRIX_API_KEY: ${{ secrets.GTMETRIX_API_KEY }}
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+
+          prompt: |
+            Run GTmetrix tests for the following URLs one by one:
+
+            ${{ steps.extract_url.outputs.gtmetrix_urls }}
+
+            For each URL:
+            1. Run the test (ignore non-zero exit — performance threshold is informational only):
+               node .github/scripts/gtmetrix.js <url> || true
+            2. Parse the output lines for:
+               - Grade    → line starting with "Grade:"
+               - Performance → line starting with "Performance:"
+               - Structure   → line starting with "Structure:"
+
+            After all URLs are tested, create or update `gtmetrix-history.json` in the repository root.
+
+            File format — a JSON array, append one entry per URL tested:
+            [
+              {
+                "url": "<tested_url>",
+                "date": "<YYYY-MM-DD>",
+                "grade": "<grade>",
+                "performance": <number>,
+                "structure": <number>
+              }
+            ]
+
+            If the file does not exist, create it as a new array.
+            If it already exists, read it and append the new entries.
+
+            After writing the file run these git commands exactly:
+            1. git config user.name "enc-action[bot]"
+            2. git config user.email "enc-action[bot]@users.noreply.github.com"
+            3. git add gtmetrix-history.json
+            4. git commit -m "Update GTmetrix history"
+            5. git pull --rebase origin main
+            6. git push
+
+            **COMMIT RULES:**
+            - Do NOT add "Co-authored-by" lines
+            - Do NOT add "Generated with Claude Code" or any attribution
+            - Keep commits clean and professional
+
+          track_progress: true
+
+          claude_args: |
+            --model "claude-opus-4-5"
+            --max-turns 30
+            --allowedTools "Bash(git:*),Bash(node:*),Edit,Write,Read,Glob,Grep,LS"
