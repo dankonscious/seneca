@@ -6,10 +6,16 @@ on:
     branches:
       - main
       - master
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: 'PR number to test issue extraction against'
+        required: true
+        type: string
 
 jobs:
   gtmetrix:
-    if: github.event.pull_request.merged == true
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -28,7 +34,7 @@ jobs:
         id: extract_url
         env:
           GH_TOKEN: ${{ github.token }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_NUMBER: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.pr_number || github.event.pull_request.number }}
           REPO: ${{ github.repository }}
         run: |
           PR_BODY=$(gh api repos/$REPO/pulls/$PR_NUMBER --jq '.body // ""')
@@ -42,111 +48,30 @@ jobs:
             echo "$ALL_TEXT" | grep -oE '#[0-9]+' | tr -d '#'
           )
 
-          UNIQUE_ISSUES=$(echo "$ISSUE_NUMBERS" | sort -u | grep -v '^$')
+          ISSUE_NUMBERS=$(echo "$ISSUE_NUMBERS" | sort -un)
 
-          if [ -z "$UNIQUE_ISSUES" ]; then
-            echo "No issue references found in PR #$PR_NUMBER — skipping."
-            exit 0
-          fi
+          echo "=== DEBUG: PR Body ==="
+          echo "$PR_BODY"
+          echo "=== DEBUG: PR Comments ==="
+          echo "$PR_COMMENTS"
+          echo "=== DEBUG: Extracted Issue Numbers ==="
+          echo "$ISSUE_NUMBERS"
 
-          echo "Found issue references: $UNIQUE_ISSUES"
-
-          for ISSUE_NUM in $UNIQUE_ISSUES; do
+          DUPLICATE_URL=""
+          for ISSUE_NUM in $ISSUE_NUMBERS; do
             ISSUE_BODY=$(gh api repos/$REPO/issues/$ISSUE_NUM --jq '.body // ""' 2>/dev/null || echo "")
+            echo "=== DEBUG: Issue #$ISSUE_NUM body ==="
+            echo "$ISSUE_BODY"
 
-            if ! echo "$ISSUE_BODY" | grep -qi "GTmetrix Score"; then
-              echo "Issue #$ISSUE_NUM does not mention 'GTmetrix Score' — skipping."
-              continue
-            fi
+            URL=$(echo "$ISSUE_BODY" | grep -oE 'duplicate_url:\s*\S+' | head -1 | sed 's/duplicate_url:[[:space:]]*//')
+            echo "=== DEBUG: URL found in issue #$ISSUE_NUM: '$URL' ==="
 
-            echo "Issue #$ISSUE_NUM mentions 'GTmetrix Score' — proceeding."
-
-            DUPLICATE_URL=$(echo "$ISSUE_BODY" | grep -i 'duplicate_url' | grep -oE 'https?://[^[:space:]"]+' | head -1)
-
-            if [ -z "$DUPLICATE_URL" ]; then
-              DUPLICATE_URL=$(echo "$ISSUE_BODY" | grep -oE 'https?://[^[:space:]"]+' | head -1)
-            fi
-
-            if [ -n "$DUPLICATE_URL" ]; then
-              echo "Found duplicate_url: $DUPLICATE_URL (issue #$ISSUE_NUM)"
-              echo "duplicate_url=$DUPLICATE_URL" >> $GITHUB_OUTPUT
-              echo "issue_number=$ISSUE_NUM" >> $GITHUB_OUTPUT
-              echo "found=true" >> $GITHUB_OUTPUT
+            if [ -n "$URL" ]; then
+              DUPLICATE_URL="$URL"
+              echo "Found duplicate_url in issue #$ISSUE_NUM: $DUPLICATE_URL"
               break
-            else
-              echo "No URL found in issue #$ISSUE_NUM — skipping."
             fi
           done
 
-          if [ -z "$(grep 'found=true' $GITHUB_OUTPUT)" ]; then
-            echo "No matching issue with 'GTmetrix Score' and a URL found — skipping."
-            echo "found=false" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Run Claude Code
-        if: steps.extract_url.outputs.found == 'true'
-        id: claude
-        env:
-          GTMETRIX_API_KEY: ${{ secrets.GTMETRIX_API_KEY }}
-        uses: anthropics/claude-code-action@v1
-        with:
-          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-
-          additional_permissions: |
-            actions: read
-
-          prompt: |
-            Run the GTMetrix test for this URL by executing:
-
-            node .github/scripts/gtmetrix.js ${{ steps.extract_url.outputs.duplicate_url }}
-
-            The script may exit with a non-zero code if performance is below threshold — that is expected. Capture all output regardless.
-
-            Once the test completes, parse the output for:
-              - Grade (e.g. "A", "B")
-              - Performance score (number)
-              - Structure score (number)
-
-            Then create or update `gtmetrix-history.json` in the repository root.
-
-            File format (JSON array, append new entry):
-            [
-              {
-                "url": "<tested_url>",
-                "date": "<YYYY-MM-DD>",
-                "grade": "<grade>",
-                "performance": <number>,
-                "structure": <number>
-              }
-            ]
-
-            If the file does not exist, create it with just this entry as an array.
-            If it already exists, read it and append the new entry.
-
-            After writing the file:
-            1. git add gtmetrix-history.json
-            2. git commit -m "Update GTMetrix history for ${{ steps.extract_url.outputs.duplicate_url }}"
-            3. git push
-
-            Then post a comment on GitHub issue #${{ steps.extract_url.outputs.issue_number }} with the test results using:
-
-            gh issue comment ${{ steps.extract_url.outputs.issue_number }} --body "**GTMetrix Result**
-
-            **URL:** ${{ steps.extract_url.outputs.duplicate_url }}
-            **Grade:** <grade>
-            **Performance:** <performance>%
-            **Structure:** <structure>%"
-
-            Replace <grade>, <performance>, and <structure> with the actual values from the test output.
-
-            **COMMIT RULES:**
-            - Do NOT add "Co-authored-by" lines to commits
-            - Do NOT add "Generated with Claude Code" or similar attributions
-            - Keep commits clean and professional
-
-          track_progress: true
-
-          claude_args: |
-            --model "claude-opus-4-5"
-            --max-turns 30
-            --allowedTools "Bash(git:*),Bash(node:*),Bash(gh issue:*),Edit,Write,Read,Glob,Grep,LS"
+          echo "duplicate_url=$DUPLICATE_URL" >> "$GITHUB_OUTPUT"
+          echo "=== FINAL: duplicate_url='$DUPLICATE_URL' ==="
