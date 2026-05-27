@@ -44,7 +44,7 @@ jobs:
 
           # Extract all URLs after "## GTmetrix Test URL(s)" heading (bare or markdown list items)
           GTMETRIX_URLS=$(echo "$PR_BODY" \
-            | awk '/^## GTmetrix Test URLs?/{found=1; next} found && /https?:\/\//{match($0,/https?:\/\/[^ \t\r\n]+/); print substr($0,RSTART,RLENGTH)} found && !/https?:\/\// && /^##/{exit}' \
+            | awk 'tolower($0) ~ /^## gtmetrix test urls?/{found=1; next} found && /https?:\/\//{match($0,/https?:\/\/[^ \t\r\n]+/); print substr($0,RSTART,RLENGTH)} found && !/https?:\/\// && /^##/{exit}' \
             | tr -d '\r')
 
           echo "=== FINAL: gtmetrix_urls ==="
