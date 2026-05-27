@@ -100,7 +100,7 @@ async function run() {
 
       console.log("RAW TEST RESULT:", JSON.stringify(result, null, 2));
 
-      const reportId = result.data.relationships?.report?.data?.id
+      const reportId = result.data.attributes?.report
         || result.data.links?.report?.split("/").pop();
 
       if (!reportId) {
