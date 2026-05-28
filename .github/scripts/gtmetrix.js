@@ -1,10 +1,10 @@
 const https = require("https");
 
-//const API_KEY = process.env.GTMETRIX_API_KEY;
-//const URL = process.argv[2];
+const API_KEY = process.env.GTMETRIX_API_KEY;
+const URL = process.argv[2];
 
-const API_KEY = "527110fbec04a25d8f776315a30cccd1";
-const URL = "https://senecahealthads.com/pages/snc-vslfb-test ";
+//const API_KEY = "527110fbec04a25d8f776315a30cccd1";
+//const URL = "https://senecahealthads.com/pages/snc-vslfb-test ";
 
 if (!URL) {
   console.error("Usage: node gtmetrix.js <url>");
