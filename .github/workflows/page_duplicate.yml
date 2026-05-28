@@ -6,7 +6,7 @@ on:
 
 jobs:
   page-duplicate:
-    if: "github.event.label.name == 'Workflow: Page Duplicate'"
+    if: "github.event.label.name == 'Page Duplicate'"
     runs-on: ubuntu-latest
     permissions:
       contents: write
