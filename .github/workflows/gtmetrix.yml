@@ -58,8 +58,10 @@ jobs:
             echo "$DELIMITER"
           } >> "$GITHUB_OUTPUT"
 
-          # Extract GitHub Issue URL from line starting with "#Issue"
-          ISSUE_URL=$(echo "$PR_BODY" | grep -E '^#Issue[[:space:]]' | grep -oE 'https?://[^ \t\r\n]+' | head -1 | tr -d '\r')
+          # Extract GitHub Issue URL from "## Issue" heading (URL on the following line)
+          ISSUE_URL=$(echo "$PR_BODY" \
+            | awk 'tolower($0) ~ /^## issue[[:space:]]*$/{found=1; next} found && /https?:\/\//{match($0,/https?:\/\/[^ \t\r\n]+/); print substr($0,RSTART,RLENGTH); exit}' \
+            | tr -d '\r')
           echo "=== FINAL: issue_url ==="
           echo "${ISSUE_URL:-<none found>}"
           echo "issue_url=$ISSUE_URL" >> "$GITHUB_OUTPUT"
