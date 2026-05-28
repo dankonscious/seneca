@@ -14,7 +14,7 @@ jobs:
       pull-requests: write
 
     env:
-      BRANCH_NAME: update-vslfb-v12-cta-links
+      BRANCH_NAME: update-vslfb-v12-cta-links-${{ github.run_id }}
 
     steps:
 
