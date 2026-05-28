@@ -5,8 +5,12 @@ const fs = require('fs');
 const body = process.env.ISSUE_BODY || '';
 
 // If the value is a full URL, extract just the pathname; otherwise use as-is.
+// Also handles GitHub's Markdown auto-link format: [label](<url>) or [label](url)
 function toRepoPath(raw) {
-  try { return new URL(raw.trim()).pathname; } catch { return raw.trim(); }
+  let s = raw.trim();
+  const mdLink = s.match(/^\[.*?\]\(<?(.*?)>?\)$/);
+  if (mdLink) s = mdLink[1];
+  try { return new URL(s).pathname; } catch { return s; }
 }
 
 // Normalize to a clean folder path — strip any trailing slash, then re-add it
