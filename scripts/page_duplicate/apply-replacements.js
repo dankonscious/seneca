@@ -3,19 +3,8 @@
 const fs   = require('fs');
 const path = require('path');
 
-const SUPPORTED_EXT = new Set(['.html', '.js', '.css', '.json']);
-
-function collectFiles(dir) {
-  const results = [];
-  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-    const full = path.join(dir, entry.name);
-    if (entry.isDirectory()) {
-      results.push(...collectFiles(full));
-    } else if (entry.isFile() && SUPPORTED_EXT.has(path.extname(entry.name).toLowerCase())) {
-      results.push(full);
-    }
-  }
-  return results;
+function escapeRegex(str) {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 const duplicatePath = (process.env.DUPLICATE_PATH || '').replace(/\/+$/, '');
@@ -37,7 +26,6 @@ if (!replaceRaw.trim()) {
   process.exit(0);
 }
 
-// Parse replace pairs once.
 const replacePairs = [];
 for (const line of replaceRaw.split('\n')) {
   const trimmed = line.trim();
@@ -56,15 +44,22 @@ for (const file of files) {
   let modified = false;
 
   for (const { old, new: newVal } of replacePairs) {
-    if (!content.includes(old)) continue;
+    // When newVal starts with old (e.g. adding a suffix like "-v6"), use a negative
+    // lookahead so already-replaced occurrences are skipped and don't get double-replaced.
+    let pattern;
+    if (newVal.startsWith(old)) {
+      const suffix = escapeRegex(newVal.slice(old.length));
+      pattern = new RegExp(escapeRegex(old) + '(?!' + suffix + ')', 'g');
+    } else {
+      pattern = new RegExp(escapeRegex(old), 'g');
+    }
 
-    let count = 0;
-    let pos   = 0;
-    while ((pos = content.indexOf(old, pos)) !== -1) { count++; pos += old.length; }
+    const matches = content.match(pattern);
+    if (!matches) continue;
 
-    content  = content.split(old).join(newVal);
+    content  = content.replace(pattern, newVal);
     modified = true;
-    console.log(`  [${path.relative(duplicatePath, file)}] ${count}x: ${JSON.stringify(old)} -> ${JSON.stringify(newVal)}`);
+    console.log(`  [${path.relative(duplicatePath, file)}] ${matches.length}x: ${JSON.stringify(old)} -> ${JSON.stringify(newVal)}`);
   }
 
   if (modified) fs.writeFileSync(file, content, 'utf8');
