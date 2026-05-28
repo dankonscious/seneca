@@ -79,11 +79,30 @@ jobs:
           DUPLICATE_PATH: ${{ steps.duplicate.outputs.duplicate_path }}
         run: node scripts/page_duplicate/apply-replacements.js
 
-      # ── Step 6 · Verification (MANDATORY) ──────────────────────────────────
+      # ── Step 6 · Detect index file ──────────────────────────────────────────
+      - name: Detect index file
+        id: detect_index
+        env:
+          DUPLICATE_PATH: ${{ steps.duplicate.outputs.duplicate_path }}
+        run: |
+          set -euo pipefail
+          if [ -f "$DUPLICATE_PATH/index.html" ]; then
+            echo "index_file=index.html" >> "$GITHUB_OUTPUT"
+            echo "Detected: index.html"
+          elif [ -f "$DUPLICATE_PATH/index.php" ]; then
+            echo "index_file=index.php" >> "$GITHUB_OUTPUT"
+            echo "Detected: index.php"
+          else
+            echo "ERROR: No index.html or index.php found in $DUPLICATE_PATH"
+            exit 1
+          fi
+
+      # ── Step 7 · Verification (MANDATORY) ──────────────────────────────────
       - name: Verify changes
         env:
           REPLACE_MAP: ${{ steps.parse.outputs.replace_map }}
           DUPLICATE_PATH: ${{ steps.duplicate.outputs.duplicate_path }}
+          INDEX_FILE: ${{ steps.detect_index.outputs.index_file }}
         run: node scripts/page_duplicate/verify.js
 
       # ── Configure git identity ──────────────────────────────────────────────
