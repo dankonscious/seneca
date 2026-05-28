@@ -139,7 +139,7 @@ jobs:
           - Dynamic CTA replacements applied
           - PR created
 
-          ## GT Metrix URLs
+          ## GTMetrix Test URLs
           ${GTMETRIX_LIST}
 
           ## Issue

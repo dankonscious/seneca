@@ -39,9 +39,9 @@ if (!refPath || !duplicatePath) {
   process.exit(1);
 }
 
-// ── GT Metrix URLs ─────────────────────────────────────────────────────────────
-// Capture everything between the "GT Metrix URLs" heading and "replace_map:"
-const gtmetrixSectionMatch = body.match(/GT\s+Metrix\s+URLs?\s*\n([\s\S]*?)(?=replace_map:|$)/i);
+// ── GTMetrix Test URLs ─────────────────────────────────────────────────────────
+// Capture everything between the "GTMetrix Test URLs" heading and "replace_map:"
+const gtmetrixSectionMatch = body.match(/GT\s*Metrix\s+Test\s+URLs?\s*\n([\s\S]*?)(?=replace_map:|$)/i);
 const gtmetrixUrls = [];
 if (gtmetrixSectionMatch) {
   for (const line of gtmetrixSectionMatch[1].split('\n')) {
@@ -50,7 +50,7 @@ if (gtmetrixSectionMatch) {
     // Resolve placeholders with full domain URLs (not repo paths)
     url = url.replace('<ref_url>', refFullUrl).replace('<duplicate_url>', dupFullUrl);
     url = toFullUrl(url);
-    if (url.startsWith('http')) gtmetrixUrls.push(url);
+    if (url.startsWith('http://') || url.startsWith('https://')) gtmetrixUrls.push(url);
   }
 }
 
