@@ -137,6 +137,7 @@ async function run() {
 
       break;
     }
+  }
 }
 
 run().catch(err => {
