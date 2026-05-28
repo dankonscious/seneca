@@ -46,6 +46,12 @@ jobs:
           # Custom prompt with strict formatting rules
           prompt: |
             **IMPORTANT - WORKFLOW RULES (STRICT)**
+            
+            **Hard Rules (Non-Negotiable)**
+
+            - NEVER commit directly to main or master
+            - NEVER link the issue number or url in the PR comment
+            - NEVER modify, close, or resolve issues
 
             **GIT & PR RULES**
             - Never commit directly to main or master
@@ -61,7 +67,7 @@ jobs:
               - URL 2
               ## Issue
               https://github.com/dankonscious/seneca/issues/113
-              
+
             - No labels, prefixes, or metadata on URLs
             - No explanations in GTMetrix section
             - Do not include issue numbers or links in PR body
