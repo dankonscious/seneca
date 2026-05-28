@@ -51,10 +51,11 @@ jobs:
           echo "$GTMETRIX_URLS"
 
           # Store as newline-delimited, encoded for GITHUB_OUTPUT
+          DELIMITER="GTMETRIX_URLS_$(openssl rand -hex 8)"
           {
-            echo "gtmetrix_urls<<EOF"
+            echo "gtmetrix_urls<<$DELIMITER"
             echo "$GTMETRIX_URLS"
-            echo "EOF"
+            echo "$DELIMITER"
           } >> "$GITHUB_OUTPUT"
 
       - name: Wait for all GTmetrix URLs to go live
@@ -125,10 +126,11 @@ jobs:
             fi
           done <<< "$GTMETRIX_URLS"
 
+          DELIMITER="GTMETRIX_RESULTS_$(openssl rand -hex 8)"
           {
-            echo "test_results<<EOF"
+            echo "test_results<<$DELIMITER"
             cat "$TMPFILE"
-            echo "EOF"
+            echo "$DELIMITER"
           } >> "$GITHUB_OUTPUT"
 
       - name: Update GTmetrix history
