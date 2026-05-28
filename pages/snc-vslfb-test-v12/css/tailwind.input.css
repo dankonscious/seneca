@@ -11,7 +11,7 @@ body, html {
     font-family: 'MyriadPro';
     src: url('https://s3.us-east-1.amazonaws.com/konsciousketo.com/fonts/fonnts.com-MyriadPro-Bold_italic.ttf') format('truetype');
     font-weight: 700;
-    font-style: italic;
+    font-style: italic; 
     font-display: swap;
 }
 
@@ -19,7 +19,7 @@ body, html {
     font-family: 'MyriadPro';
     src: url('https://s3.us-east-1.amazonaws.com/konsciousketo.com/fonts/Myriad_Pro_Semibold_Italic.otf') format('opentype');
     font-weight: 600;
-    font-style: italic;
+    font-style: italic; 
     font-display: swap;
 }
 
@@ -27,7 +27,7 @@ body, html {
     font-family: 'MyriadPro';
     src: url('https://s3.us-east-1.amazonaws.com/konsciousketo.com/fonts/Myriad+Pro+Black.otf') format('opentype');
     font-weight: 900;
-    font-style: normal;
+    font-style: normal; 
     font-display: swap;
 }
 
@@ -35,7 +35,7 @@ body, html {
     font-family: 'MyriadPro';
     src: url('https://s3.us-east-1.amazonaws.com/konsciousketo.com/fonts/Myriad+Pro+Bold.ttf') format('truetype');
     font-weight: 700;
-    font-style: normal;
+    font-style: normal; 
     font-display: swap;
 }
 
@@ -43,7 +43,7 @@ body, html {
     font-family: 'MyriadPro';
     src: url('https://s3.us-east-1.amazonaws.com/konsciousketo.com/fonts/Myriad+Pro+Semibold.ttf') format('truetype');
     font-weight: 600;
-    font-style: normal;
+    font-style: normal; 
     font-display: swap;
 }
 
@@ -51,7 +51,7 @@ body, html {
     font-family: 'MyriadPro';
     src: url('https://s3.us-east-1.amazonaws.com/konsciousketo.com/fonts/Myriad+Pro+Regular.ttf') format('truetype');
     font-weight: 400;
-    font-style: normal;
+    font-style: normal; 
     font-display: swap;
 }
 @font-face {
@@ -66,7 +66,7 @@ body, html {
     font-family: 'HelveticaNeue';
     src: url('https://s3.us-east-1.amazonaws.com/konsciousketo.com/fonts/HelveticaNeueBold.ttf') format('truetype');
     font-weight: 700;
-    font-style: normal;
+    font-style: normal; 
     font-display: swap;
 }
 
@@ -74,7 +74,7 @@ body, html {
     font-family: 'HelveticaNeue';
     src: url('https://s3.us-east-1.amazonaws.com/konsciousketo.com/fonts/HelveticaNeueMedium.ttf') format('truetype');
     font-weight: 600;
-    font-style: normal;
+    font-style: normal; 
     font-display: swap;
 }
 @font-face {
@@ -84,7 +84,7 @@ body, html {
     font-style: normal;
     font-display: swap;
 }
-
+   
 @font-face {
   font-family: 'Helvetica';
   src: url('https://s3.us-east-1.amazonaws.com/konsciousketo.com/fonts/Helvetica-Bold.ttf') format('truetype');
