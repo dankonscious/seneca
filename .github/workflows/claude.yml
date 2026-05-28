@@ -55,7 +55,8 @@ jobs:
             Always include a summary of changes in the PR body. 
             Do NOT include issue numbers or issue references in the PR body. 
             NEVER modify, close, resolve, or change the status of any issue.
-             
+            
+            
             ** GTMETRIX RULES **
             - Include all the GTmetrix Test URLs in the PR Summary.
             - Strictly follow the exact output structure provided.
@@ -78,8 +79,27 @@ jobs:
             - Keep commits clean and professional
           
             **WHEN WORKING ON PR FEEDBACK:**
-            Make the requested changes and commit. The PR will automatically update - do NOT create a new PR.
-           
+            
+            Make the requested changes and commit them to the existing branch.
+
+            Rules:
+
+            Do NOT create a new PR
+            The existing PR must be updated automatically through new commits
+            Keep all changes within the current PR branch
+
+            At the end of every response, include the related GitHub issue reference using this exact format:
+
+            #Issue https://github.com/dankonscious/seneca/issues/103
+
+            Additional Rules:
+
+            Plain text only
+            Do NOT use markdown hyperlinks
+            Do NOT modify the format
+            Do NOT use keywords such as Fixes, Closes, Resolves, or similar auto-closing references
+            The issue reference is for tracking only and must NOT auto-close the issue when the PR is merged
+
             **WHEN FIXING CI FAILURES:**
             Fix the issues, commit the fix. The CI will automatically re-run.
            
