@@ -1,7 +1,10 @@
 const https = require("https");
 
-const API_KEY = process.env.GTMETRIX_API_KEY;
-const URL = process.argv[2];
+//const API_KEY = process.env.GTMETRIX_API_KEY;
+//const URL = process.argv[2];
+
+const API_KEY = "527110fbec04a25d8f776315a30cccd1";
+const URL = "https://senecahealthads.com/pages/snc-vslfb-test ";
 
 if (!URL) {
   console.error("Usage: node gtmetrix.js <url>");
@@ -110,7 +113,7 @@ async function run() {
 
       const report = await request("GET", `/api/2.0/reports/${reportId}`);
 
-      console.log("RAW REPORT RESULT:", JSON.stringify(report, null, 2));
+      
 
       const attrs = report.data.attributes;
 
