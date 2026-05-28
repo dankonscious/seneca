@@ -58,7 +58,10 @@ jobs:
         env:
           REF_PATH: ${{ steps.parse.outputs.ref_path }}
           DUPLICATE_PATH: ${{ steps.parse.outputs.duplicate_path }}
-        run: node scripts/page_duplicate/duplicate-folder.js
+        run: |
+          set -euo pipefail
+          cp -R "$REF_PATH" "$DUPLICATE_PATH"
+          echo "duplicate_path=$DUPLICATE_PATH" >> "$GITHUB_OUTPUT"
 
       # ── Step 5 · Apply dynamic CTA replacements ─────────────────────────────
       - name: Apply CTA replacements
