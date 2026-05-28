@@ -53,6 +53,12 @@ jobs:
         run: node scripts/page_duplicate/parse-issue.js
 
       # ── Step 4 · Duplicate folder ───────────────────────────────────────────
+      - name: Debug paths
+        run: |
+          pwd
+          ls -la
+          ls -la pages
+
       - name: Duplicate folder
         id: duplicate
         env:
@@ -60,6 +66,9 @@ jobs:
           DUPLICATE_PATH: ${{ steps.parse.outputs.duplicate_path }}
         run: |
           set -euo pipefail
+          # Strip any leading slash to ensure paths are repo-relative
+          REF_PATH="${REF_PATH#/}"
+          DUPLICATE_PATH="${DUPLICATE_PATH#/}"
           cp -R "$REF_PATH" "$DUPLICATE_PATH"
           echo "duplicate_path=$DUPLICATE_PATH" >> "$GITHUB_OUTPUT"
 
