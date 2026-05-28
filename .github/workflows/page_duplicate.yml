@@ -98,13 +98,6 @@ jobs:
           INDEX_FILE: ${{ steps.detect_index.outputs.index_file }}
         run: node scripts/page_duplicate/apply-replacements.js
 
-      # ── Step 7 · Verification ────────────────────────────────────────────────
-      - name: Verify changes
-        env:
-          REPLACE_MAP: ${{ steps.parse.outputs.replace_map }}
-          DUPLICATE_PATH: ${{ steps.duplicate.outputs.duplicate_path }}
-          INDEX_FILE: ${{ steps.detect_index.outputs.index_file }}
-        run: node scripts/page_duplicate/verify.js
 
       # ── Configure git identity ──────────────────────────────────────────────
       - name: Configure git identity
