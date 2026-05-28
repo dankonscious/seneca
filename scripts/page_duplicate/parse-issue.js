@@ -4,10 +4,15 @@ const fs = require('fs');
 
 const body = process.env.ISSUE_BODY || '';
 
+// If the value is a full URL, extract just the pathname; otherwise use as-is.
+function toRepoPath(raw) {
+  try { return new URL(raw.trim()).pathname; } catch { return raw.trim(); }
+}
+
 // Normalize to a clean folder path — strip any trailing slash, then re-add it
 // so downstream scripts always receive a consistent "dir/" form.
 function normalizeFolder(p) {
-  return p.trim().replace(/\/+$/, '') + '/';
+  return toRepoPath(p).replace(/\/+$/, '') + '/';
 }
 
 // ── ref_url (repo-relative folder path) ──────────────────────────────────────
