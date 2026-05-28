@@ -45,92 +45,42 @@ jobs:
 
           # Custom prompt with strict formatting rules
           prompt: |
-            **IMPORTANT - WHEN WORKING ON ISSUES:**
-            After you finish implementing the code changes and committing them, create a pull request:
-            ```
-            gh pr create --title "Your descriptive title" --body "## Summary
-            Your summary of what was implemented.
-             
-            ```
-            Always include a summary of changes in the PR body. 
-            Do NOT include issue numbers or issue references in the PR body. 
-            NEVER modify, close, resolve, or change the status of any issue.
+            **IMPORTANT - WORKFLOW RULES (STRICT)**
+
+            **GIT & PR RULES**
+            - Never commit directly to main or master
+            - Always create a feature branch
+            - Always push changes to existing branch
+            - Never create duplicate PRs for same task
+            - PR must be created after commits
+
+            **PR CONTENT RULES**
+            - Always include GTmetrix Test URLs in PR summary:
+              ## GTMetrix Test URLs
+              - URL 1
+              - URL 2
+              ## Issue
+              https://github.com/dankonscious/seneca/issues/113
+              
+            - No labels, prefixes, or metadata on URLs
+            - No explanations in GTMetrix section
+            - Do not include issue numbers or links in PR body
+            - Never auto-close or reference issues as resolved
+
+            **ISSUE RULES**
+            - Always comment on issue after PR creation
+            - Do NOT modify, close, or resolve issues
+            - Issue link is for tracking only
+
+            **COMMIT RULES**
+            - No "Co-authored-by"
+            - No AI/Claude attribution
+            - Single-line, clean commits only
+            - Imperative style (Add, Fix, Update, Remove)
+            - Max 72 characters
+            - No prefixes (feat:, fix:)
             
-            
-            ** GTMETRIX RULES **
-            - Include all the GTmetrix Test URLs in the PR Summary.
-            - Strictly follow the exact output structure provided.
-            - Do NOT rename labels.
-            - Do NOT prepend any variable names, labels, identifiers, or aliases before the URLs (examples: "duplicate_url:", "ref_url:", "test_url:", etc.).
-            - Do NOT add explanations, annotations, or extra formatting.
-            - Only output the raw URLs exactly as provided.
-
-            Use this exact format:
-
-            ## GTMetrix Test URLs
-            - {{url}}
-            - {{url}}
-            - {{url}}
-
-
-            **COMMIT RULES:**
-            - Do NOT add "Co-authored-by" lines to commits
-            - Do NOT add "Generated with Claude Code" or similar attributions
-            - Keep commits clean and professional
-          
-            **WHEN WORKING ON PR FEEDBACK:**
-            
-            Make the requested changes and commit them to the existing branch.
-
-            Rules:
-
-            Do NOT create a new PR
-            The existing PR must be updated automatically through new commits
-            Keep all changes within the current PR branch
-
-            At the end of every response, include the related GitHub issue reference using this exact format:
-
-            ## Issue 
-            https://github.com/dankonscious/seneca/issues/103
-
-            Additional Rules:
-
-            Plain text only
-            Do NOT use markdown hyperlinks
-            Do NOT modify the format
-            Do NOT use keywords such as Fixes, Closes, Resolves, or similar auto-closing references
-            The issue reference is for tracking only and must NOT auto-close the issue when the PR is merged
-
-            **WHEN FIXING CI FAILURES:**
-            Fix the issues, commit the fix. The CI will automatically re-run.
-           
-            **WHEN RETURNING GTMETRIX HISTORY RESULT:**
-            
-            1. Read data ONLY from:
-              gtmetrix-history.json
-
-            2. Filter rules:
-              - Include ONLY entries that match the requested URL exactly
-              - Do NOT include any other URLs
-              - Do NOT include partial matches
-
-            3. Output format (STRICT):
-
-            GTMetrix History for: <URL>
-            - <Date> | Grade: <X> | Performance: <X>% | Structure: <X>%
-            - <Date> | Grade: <X> | Performance: <X>% | Structure: <X>%
-
-            4. Output rules:
-              - No extra text
-              - No explanations
-              - No headers besides the title line
-              - No empty lines
-              - No commentary
-              - Keep chronological order (oldest → newest)
-
-            **OUTPUT RULES:**
-          
-            ## Commit Message Requirements (max 72 chars)
+            # Commit Message Requirements (max 72 chars)
             - Imperative mood: "Add" not "Added"
             - Action verbs: Add, Update, Fix, Remove, Refactor, Implement
             - No articles (a, an, the)
@@ -138,6 +88,25 @@ jobs:
             - No prefixes like "feat:", "fix:"
             - Single line only
             - NO co-author attributions
+
+            **GTMETRIX RULES**
+            - Only output raw URLs
+            - Must match exact URLs (no partial matches)
+            - Source must be gtmetrix-history.json only
+            - Output format:
+              GTMetrix History for: <URL>
+              - <Date> | Grade: X | Performance: X% | Structure: X%
+
+            **CI RULES**
+            - Fix issues and commit only
+            - CI reruns automatically
+
+            **SAFETY RULES**
+            - Never touch main/master directly
+            - Never alter issue status
+            - Never close issues under any condition
+
+            
 
           # Enable progress tracking
           track_progress: true
