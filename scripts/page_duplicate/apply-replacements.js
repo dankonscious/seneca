@@ -20,9 +20,15 @@ function collectFiles(dir) {
 
 const duplicatePath = (process.env.DUPLICATE_PATH || '').replace(/\/+$/, '');
 const replaceRaw    = process.env.REPLACE_MAP    || '';
+const indexFile     = process.env.INDEX_FILE     || '';
 
 if (!duplicatePath) {
   console.error('ERROR: DUPLICATE_PATH is not set.');
+  process.exit(1);
+}
+
+if (!indexFile) {
+  console.error('ERROR: INDEX_FILE is not set.');
   process.exit(1);
 }
 
@@ -42,8 +48,8 @@ for (const line of replaceRaw.split('\n')) {
   if (old) replacePairs.push({ old, new: newVal });
 }
 
-const files = collectFiles(duplicatePath);
-console.log(`Scanning ${files.length} file(s) in ${duplicatePath}/`);
+const files = [path.join(duplicatePath, indexFile)];
+console.log(`Scanning ${files.length} file(s) in ${duplicatePath}/ (${indexFile} only)`);
 
 for (const file of files) {
   let content  = fs.readFileSync(file, 'utf8');

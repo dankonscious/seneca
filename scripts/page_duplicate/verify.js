@@ -21,6 +21,7 @@ function collectFiles(dir) {
 
 const duplicatePath = (process.env.DUPLICATE_PATH || '').replace(/\/+$/, '');
 const replaceRaw    = process.env.REPLACE_MAP    || '';
+const indexFile     = process.env.INDEX_FILE     || '';
 let failed          = false;
 
 // ── 1. Duplicate folder must exist ────────────────────────────────────────────
@@ -30,9 +31,14 @@ if (!fs.existsSync(duplicatePath) || !fs.statSync(duplicatePath).isDirectory()) 
 }
 console.log(`PASS: Duplicate folder exists: ${duplicatePath}/`);
 
-// Collect and concatenate all supported file contents for a single-pass check.
-const files = collectFiles(duplicatePath);
-console.log(`Scanning ${files.length} file(s) in ${duplicatePath}/`);
+if (!indexFile) {
+  console.error('FAIL: INDEX_FILE is not set.');
+  process.exit(1);
+}
+
+// Only scan the index file where replacements were applied.
+const files = [path.join(duplicatePath, indexFile)];
+console.log(`Scanning ${files.length} file(s) in ${duplicatePath}/ (${indexFile} only)`);
 
 const allContent = files.map(f => fs.readFileSync(f, 'utf8')).join('\n');
 
