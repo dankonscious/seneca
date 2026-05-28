@@ -101,7 +101,7 @@ async function run() {
 
     if (state === "completed") {
 
-      console.log("RAW TEST RESULT:", JSON.stringify(result, null, 2));
+      console.log("GTmetrix test completed");
 
       const reportId = result.data.attributes?.report
         || result.data.links?.report?.split("/").pop();
@@ -113,8 +113,6 @@ async function run() {
 
       const report = await request("GET", `/api/2.0/reports/${reportId}`);
 
-      
-
       const attrs = report.data.attributes;
 
       console.log("");
@@ -124,6 +122,7 @@ async function run() {
       console.log(`Structure: ${attrs.structure_score}`);
 
       const today = new Date().toISOString().slice(0, 10);
+
       console.log("RESULT_JSON:" + JSON.stringify({
         url: URL,
         date: today,
@@ -138,7 +137,6 @@ async function run() {
 
       break;
     }
-  }
 }
 
 run().catch(err => {

@@ -96,6 +96,8 @@ jobs:
             check_url_live "$URL"
           done <<< "$GTMETRIX_URLS"
 
+      - name: Install jq
+        run: sudo apt-get install -y jq
 
       - name: Run GTmetrix tests
         if: steps.extract_url.outputs.gtmetrix_urls != ''
@@ -110,12 +112,15 @@ jobs:
           while IFS= read -r URL; do
             [ -z "$URL" ] && continue
             echo "--- Testing: $URL ---"
+
             OUTPUT=$(node .github/scripts/gtmetrix.js "$URL" 2>&1 || true)
             echo "$OUTPUT"
 
             JSON_ENTRY=$(echo "$OUTPUT" | grep '^RESULT_JSON:' | sed 's/^RESULT_JSON://')
+
             if [ -n "$JSON_ENTRY" ]; then
               echo "$JSON_ENTRY" > /tmp/gtmetrix_entry.json
+
               node -e "
                 const fs = require('fs');
                 const arr = JSON.parse(fs.readFileSync('$TMPFILE', 'utf8'));
@@ -126,12 +131,9 @@ jobs:
             fi
           done <<< "$GTMETRIX_URLS"
 
-          DELIMITER="GTMETRIX_RESULTS_$(openssl rand -hex 8)"
-          {
-            echo "test_results<<$DELIMITER"
-            cat "$TMPFILE"
-            echo "$DELIMITER"
-          } >> "$GITHUB_OUTPUT"
+          JSON_OUTPUT=$(jq -c . "$TMPFILE")
+
+          echo "test_results=$JSON_OUTPUT" >> "$GITHUB_OUTPUT"
 
       - name: Update GTmetrix history
         if: steps.extract_url.outputs.gtmetrix_urls != ''
