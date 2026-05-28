@@ -192,6 +192,7 @@ jobs:
             const results = JSON.parse(process.env.TEST_RESULTS || '[]');
             if (!results.length) process.exit(0);
             let body = '## GTMetrix Test Results\n\n';
+            body += 'Each URL was tested in GTMetrix 5 times and the best result was selected.\n\n';
             for (const r of results) {
               body += '### ' + r.url + '\n';
               body += '- Selected From: ' + (r.selected_from || 1) + ' test runs\n';
