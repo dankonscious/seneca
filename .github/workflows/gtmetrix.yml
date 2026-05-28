@@ -58,6 +58,12 @@ jobs:
             echo "$DELIMITER"
           } >> "$GITHUB_OUTPUT"
 
+          # Extract GitHub Issue URL from line starting with "#Issue"
+          ISSUE_URL=$(echo "$PR_BODY" | grep -E '^#Issue[[:space:]]' | grep -oE 'https?://[^ \t\r\n]+' | head -1 | tr -d '\r')
+          echo "=== FINAL: issue_url ==="
+          echo "${ISSUE_URL:-<none found>}"
+          echo "issue_url=$ISSUE_URL" >> "$GITHUB_OUTPUT"
+
       - name: Wait for all GTmetrix URLs to go live
         env:
           GTMETRIX_URLS: ${{ steps.extract_url.outputs.gtmetrix_urls }}
@@ -134,6 +140,34 @@ jobs:
           JSON_OUTPUT=$(jq -c . "$TMPFILE")
 
           echo "test_results=$JSON_OUTPUT" >> "$GITHUB_OUTPUT"
+
+      - name: Post GTMetrix results to GitHub Issue
+        if: steps.extract_url.outputs.issue_url != '' && steps.run_tests.outputs.test_results != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TEST_RESULTS: ${{ steps.run_tests.outputs.test_results }}
+          ISSUE_URL: ${{ steps.extract_url.outputs.issue_url }}
+        run: |
+          COMMENT_BODY=$(node -e "
+            const results = JSON.parse(process.env.TEST_RESULTS || '[]');
+            if (!results.length) process.exit(0);
+            let body = '## GTMetrix Test Results\n\n';
+            for (const r of results) {
+              body += '### ' + r.url + '\n';
+              body += '- Grade: ' + r.grade + '\n';
+              body += '- Performance: ' + r.performance + '%\n';
+              body += '- Structure: ' + r.structure + '%\n\n';
+            }
+            process.stdout.write(body.trim());
+          ")
+
+          if [ -z "$COMMENT_BODY" ]; then
+            echo "⚠️  No GTMetrix results to post — skipping."
+            exit 0
+          fi
+
+          echo "=== Posting comment to: $ISSUE_URL ==="
+          gh issue comment "$ISSUE_URL" --body "$COMMENT_BODY"
 
       - name: Update GTmetrix history
         if: steps.extract_url.outputs.gtmetrix_urls != ''
