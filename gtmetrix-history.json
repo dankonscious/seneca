@@ -26,5 +26,26 @@
     "grade": "C",
     "performance": 73,
     "structure": 85
+  },
+  {
+    "url": "https://senecahealthads.com/pages/snc-vslfb-test-v9",
+    "date": "2026-05-28",
+    "grade": "C",
+    "performance": 67,
+    "structure": 84
+  },
+  {
+    "url": "https://senecahealthads.com/pages/snc-vslfb-test",
+    "date": "2026-05-28",
+    "grade": "C",
+    "performance": 65,
+    "structure": 85
+  },
+  {
+    "url": "https://github.com/dankonscious/seneca/issues/105",
+    "date": "2026-05-28",
+    "grade": "C",
+    "performance": 56,
+    "structure": 91
   }
 ]
