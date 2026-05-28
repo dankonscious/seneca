@@ -90,7 +90,7 @@ jobs:
 
             At the end of every response, include the related GitHub issue reference using this exact format:
 
-            ##Issue 
+            ## Issue 
             https://github.com/dankonscious/seneca/issues/103
 
             Additional Rules:
