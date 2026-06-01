@@ -131,5 +131,21 @@
     "performance": 77,
     "structure": 85,
     "selected_from": 5
+  },
+  {
+    "url": "https://senecahealthads.com/pages/snc-vslfb-test",
+    "date": "2026-06-01",
+    "grade": "C",
+    "performance": 75,
+    "structure": 85,
+    "selected_from": 5
+  },
+  {
+    "url": "https://senecahealthads.com/pages/snc-vslfb-test-v2",
+    "date": "2026-06-01",
+    "grade": "B",
+    "performance": 78,
+    "structure": 85,
+    "selected_from": 5
   }
 ]
