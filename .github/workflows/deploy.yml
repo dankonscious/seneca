@@ -1,0 +1,185 @@
+# -----------------------------------------------------------------------------
+# Workflow: Deploy
+# Steps:
+#   1. QA check — images < 1MB, valid web extensions, no duplicate filenames
+#   2a. If QA fails  → notify Slack
+#   2b. If QA passes → run FTP deploy + AWS deploy (parallel)
+# -----------------------------------------------------------------------------
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+      - master
+
+jobs:
+
+  # ---------------------------------------------------------------------------
+  # Job 1: QA Validation
+  # ---------------------------------------------------------------------------
+  qa-check:
+    name: QA Validation
+    runs-on: ubuntu-latest
+    outputs:
+      qa_passed:       ${{ steps.qa.outputs.qa_passed }}
+      failure_message: ${{ steps.qa.outputs.failure_message }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run QA checks
+        id: qa
+        run: |
+          BEFORE="${{ github.event.before }}"
+          AFTER="${{ github.sha }}"
+
+          # On the very first push, before is the zero SHA — list all tracked files
+          if [ "$BEFORE" = "0000000000000000000000000000000000000000" ]; then
+            CHANGED=$(git ls-tree -r --name-only HEAD)
+          else
+            CHANGED=$(git diff --name-only --diff-filter=AM "$BEFORE" "$AFTER")
+          fi
+
+          if [ -z "$CHANGED" ]; then
+            echo "No changed files detected — skipping QA"
+            echo "qa_passed=true"        >> "$GITHUB_OUTPUT"
+            echo "failure_message="      >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "Files to validate:"
+          echo "$CHANGED"
+          echo "---"
+
+          QA_PASSED=true
+          FAILURES=""
+
+          IMAGE_EXTS="jpg jpeg png gif webp svg ico avif bmp tiff"
+          WEB_EXTS="html htm php css js ts json xml txt md scss less htaccess map yaml yml mp4"
+
+          # ------------------------------------------------------------------
+          # Check 1: Every image file must be smaller than 1MB
+          # ------------------------------------------------------------------
+          while IFS= read -r file; do
+            [ -z "$file" ] && continue
+            ext="${file##*.}"
+            ext="${ext,,}"
+
+            is_image=false
+            for img_ext in $IMAGE_EXTS; do
+              [ "$ext" = "$img_ext" ] && is_image=true && break
+            done
+
+            if [ "$is_image" = true ] && [ -f "$file" ]; then
+              size=$(stat -c%s "$file")
+              if [ "$size" -ge 1048576 ]; then
+                size_mb=$(awk "BEGIN {printf \"%.2f\", $size / 1048576}")
+                FAILURES="${FAILURES}Image exceeds 1MB (${size_mb}MB): ${file}\n"
+                QA_PASSED=false
+              fi
+            fi
+          done <<< "$CHANGED"
+
+          # ------------------------------------------------------------------
+          # Check 2: Every web file must have a recognized extension
+          # ------------------------------------------------------------------
+          while IFS= read -r file; do
+            [ -z "$file" ] && continue
+            base=$(basename "$file")
+            [[ "$base" == .* ]]    && continue  # dotfiles (.htaccess, etc.) are OK
+            [[ "$base" != *.* ]]   && continue  # extensionless files — skip
+
+            ext="${base##*.}"
+            ext="${ext,,}"
+
+            is_valid=false
+            for valid_ext in $IMAGE_EXTS $WEB_EXTS; do
+              [ "$ext" = "$valid_ext" ] && is_valid=true && break
+            done
+
+            if [ "$is_valid" = false ]; then
+              FAILURES="${FAILURES}Unrecognized file extension (.${ext}): ${file}\n"
+              QA_PASSED=false
+            fi
+          done <<< "$CHANGED"
+
+          # ------------------------------------------------------------------
+          # Check 3: No duplicate filenames anywhere in the repo
+          # ------------------------------------------------------------------
+          DUPES=$(find . -type f \
+            ! -path './.git/*' \
+            ! -path './node_modules/*' \
+            | sed 's|.*/||' \
+            | sort | uniq -d)
+
+          if [ -n "$DUPES" ]; then
+            while IFS= read -r dupe; do
+              [ -z "$dupe" ] && continue
+              PATHS=$(find . -type f \
+                ! -path './.git/*' \
+                ! -path './node_modules/*' \
+                -name "$dupe" | tr '\n' ' ')
+              FAILURES="${FAILURES}Duplicate filename '${dupe}': ${PATHS}\n"
+              QA_PASSED=false
+            done <<< "$DUPES"
+          fi
+
+          # ------------------------------------------------------------------
+          # Emit outputs
+          # ------------------------------------------------------------------
+          if [ "$QA_PASSED" = "true" ]; then
+            echo "✅ All QA checks passed"
+            echo "qa_passed=true"   >> "$GITHUB_OUTPUT"
+            echo "failure_message=" >> "$GITHUB_OUTPUT"
+          else
+            echo "❌ QA checks failed:"
+            printf "$FAILURES"
+            echo "qa_passed=false" >> "$GITHUB_OUTPUT"
+            {
+              echo 'failure_message<<EOF'
+              printf "$FAILURES"
+              echo EOF
+            } >> "$GITHUB_OUTPUT"
+          fi
+
+  # ---------------------------------------------------------------------------
+  # Job 2a: Notify Slack if QA failed
+  # ---------------------------------------------------------------------------
+  notify-failure:
+    name: Notify Slack on Failure
+    needs: qa-check
+    if: needs.qa-check.outputs.qa_passed == 'false'
+    uses: dankonscious/automation-workflow/.github/workflows/slack.yml@main
+    permissions:
+      contents: write
+    secrets: inherit
+    with:
+      message: ${{ needs.qa-check.outputs.failure_message }}
+
+  # ---------------------------------------------------------------------------
+  # Job 2b: Deploy via FTP if QA passed
+  # ---------------------------------------------------------------------------
+  deploy-ftp:
+    name: FTP Deploy
+    needs: qa-check
+    if: needs.qa-check.outputs.qa_passed == 'true'
+    uses: dankonscious/automation-workflow/.github/workflows/ftp_deploy.yml@main
+    permissions:
+      contents: write
+    secrets: inherit
+
+  # ---------------------------------------------------------------------------
+  # Job 2b: Deploy to AWS if QA passed (runs in parallel with deploy-ftp)
+  # ---------------------------------------------------------------------------
+  deploy-aws:
+    name: AWS Deploy
+    needs: qa-check
+    if: needs.qa-check.outputs.qa_passed == 'true'
+    uses: dankonscious/automation-workflow/.github/workflows/aws_deploy.yml@main
+    permissions:
+      contents: write
+    secrets: inherit
