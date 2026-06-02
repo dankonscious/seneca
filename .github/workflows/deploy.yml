@@ -42,8 +42,6 @@ jobs:
   # ---------------------------------------------------------------------------
   deploy-ftp:
     name: FTP Deploy
-    needs: qa-check
-    if: needs.qa-check.outputs.qa_passed == 'true'
     uses: dankonscious/automation-workflow/.github/workflows/ftp_deploy.yml@main
     permissions:
       contents: write
@@ -54,8 +52,6 @@ jobs:
   # ---------------------------------------------------------------------------
   deploy-aws:
     name: AWS Deploy
-    needs: qa-check
-    if: needs.qa-check.outputs.qa_passed == 'true'
     uses: dankonscious/automation-workflow/.github/workflows/aws_deploy.yml@main
     permissions:
       contents: write
