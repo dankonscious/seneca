@@ -1,9 +1,10 @@
 # -----------------------------------------------------------------------------
 # Workflow: Deploy
 # Steps:
-#   1. QA check — images < 1MB, valid web extensions, no duplicate filenames
-#   2a. If QA fails  → notify Slack
-#   2b. If QA passes → run FTP deploy + AWS deploy (parallel)
+#   1a. FTP deploy     ─┐ parallel
+#   1b. AWS deploy     ─┘
+#   2.  QA check on the recently committed folder
+#   3.  If QA fails → notify Slack
 # -----------------------------------------------------------------------------
 name: Deploy
 
@@ -14,17 +15,39 @@ on:
       - master
 
 jobs:
+
   # ---------------------------------------------------------------------------
-  # Job 1: QA Validation
+  # Job 1a: Deploy via FTP
+  # ---------------------------------------------------------------------------
+  deploy-ftp:
+    name: FTP Deploy
+    uses: dankonscious/automation-workflow/.github/workflows/ftp_deploy.yml@main
+    permissions:
+      contents: write
+    secrets: inherit
+
+  # ---------------------------------------------------------------------------
+  # Job 1b: Deploy to AWS (runs in parallel with deploy-ftp)
+  # ---------------------------------------------------------------------------
+  deploy-aws:
+    name: AWS Deploy
+    uses: dankonscious/automation-workflow/.github/workflows/aws_deploy.yml@main
+    permissions:
+      contents: write
+    secrets: inherit
+
+  # ---------------------------------------------------------------------------
+  # Job 2: QA Validation (runs after both deploys complete)
   # ---------------------------------------------------------------------------
   qa-check:
     name: QA Validation
+    needs: [deploy-ftp, deploy-aws]
     uses: dankonscious/automation-workflow/.github/workflows/qa_check.yml@main
     permissions:
-      contents: read 
+      contents: read
 
   # ---------------------------------------------------------------------------
-  # Job 2a: Notify Slack if QA failed
+  # Job 3: Notify Slack if QA failed
   # ---------------------------------------------------------------------------
   notify-failure:
     name: Notify Slack on Failure
@@ -36,23 +59,3 @@ jobs:
     secrets: inherit
     with:
       message: ${{ needs.qa-check.outputs.failure_message }}
-
-  # ---------------------------------------------------------------------------
-  # Job 2b: Deploy via FTP if QA passed
-  # ---------------------------------------------------------------------------
-  deploy-ftp:
-    name: FTP Deploy
-    uses: dankonscious/automation-workflow/.github/workflows/ftp_deploy.yml@main
-    permissions:
-      contents: write
-    secrets: inherit
-
-  # ---------------------------------------------------------------------------
-  # Job 2b: Deploy to AWS if QA passed (runs in parallel with deploy-ftp)
-  # ---------------------------------------------------------------------------
-  deploy-aws:
-    name: AWS Deploy
-    uses: dankonscious/automation-workflow/.github/workflows/aws_deploy.yml@main
-    permissions:
-      contents: write
-    secrets: inherit
