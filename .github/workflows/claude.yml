@@ -13,4 +13,9 @@ on:
 jobs:
   claude:
     uses: dankonscious/automation-workflow/.github/workflows/claude.yml@main
+    permissions:
+      actions: read
+      issues: write
+      pull-requests: read
+      id-token: write
     secrets: inherit
