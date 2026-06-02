@@ -5,7 +5,7 @@ on:
 
 jobs:
   claude:
-    uses: dankonscious/automation-workflow/.github/workflows/claude-code.yml@main
+    uses: dankonscious/automation-workflow/.github/workflows/claude.yml@main
 
     secrets:
       ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
