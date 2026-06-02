@@ -21,7 +21,7 @@ jobs:
     name: QA Validation
     uses: dankonscious/automation-workflow/.github/workflows/qa_check.yml@main
     permissions:
-      contents: read
+      contents: read 
 
   # ---------------------------------------------------------------------------
   # Job 2a: Notify Slack if QA failed
