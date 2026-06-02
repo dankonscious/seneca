@@ -64,6 +64,7 @@ jobs:
           # ------------------------------------------------------------------
           # Check 1: Every image file must be smaller than 1MB
           # ------------------------------------------------------------------
+          CHECK1_FAILED=false
           while IFS= read -r file; do
             [ -z "$file" ] && continue
             ext="${file##*.}"
@@ -77,16 +78,17 @@ jobs:
             if [ "$is_image" = true ] && [ -f "$file" ]; then
               size=$(stat -c%s "$file")
               if [ "$size" -ge 1048576 ]; then
-                size_mb=$(awk "BEGIN {printf \"%.2f\", $size / 1048576}")
-                FAILURES="${FAILURES}Image exceeds 1MB (${size_mb}MB): ${file}\n"
+                CHECK1_FAILED=true
                 QA_PASSED=false
               fi
             fi
           done <<< "$CHANGED"
+          [ "$CHECK1_FAILED" = true ] && FAILURES="${FAILURES}Check 1: Image size exceeded 1MB\n"
 
           # ------------------------------------------------------------------
           # Check 2: Every web file must have a recognized extension
           # ------------------------------------------------------------------
+          CHECK2_FAILED=false
           while IFS= read -r file; do
             [ -z "$file" ] && continue
             base=$(basename "$file")
@@ -102,10 +104,11 @@ jobs:
             done
 
             if [ "$is_valid" = false ]; then
-              FAILURES="${FAILURES}Unrecognized file extension (.${ext}): ${file}\n"
+              CHECK2_FAILED=true
               QA_PASSED=false
             fi
           done <<< "$CHANGED"
+          [ "$CHECK2_FAILED" = true ] && FAILURES="${FAILURES}Check 2: Unrecognized file extension\n"
 
           # ------------------------------------------------------------------
           # Check 3: No duplicate filenames anywhere in the repo
@@ -117,15 +120,8 @@ jobs:
             | sort | uniq -d)
 
           if [ -n "$DUPES" ]; then
-            while IFS= read -r dupe; do
-              [ -z "$dupe" ] && continue
-              PATHS=$(find . -type f \
-                ! -path './.git/*' \
-                ! -path './node_modules/*' \
-                -name "$dupe" | tr '\n' ' ')
-              FAILURES="${FAILURES}Duplicate filename '${dupe}': ${PATHS}\n"
-              QA_PASSED=false
-            done <<< "$DUPES"
+            FAILURES="${FAILURES}Check 3: Duplicate filenames found\n"
+            QA_PASSED=false
           fi
 
           # ------------------------------------------------------------------
