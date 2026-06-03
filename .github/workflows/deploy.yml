@@ -37,7 +37,6 @@ jobs:
     uses: EnclaveLLC/automation-workflow/.github/workflows/aws_deploy.yml@main
     permissions:
       contents: write
-    secrets: inherit
 
   # ---------------------------------------------------------------------------
   # Job 2: QA Validation (runs after both deploys complete)
@@ -59,6 +58,5 @@ jobs:
     uses: EnclaveLLC/automation-workflow/.github/workflows/slack.yml@main
     permissions:
       contents: write
-    secrets: inherit
     with:
       message: ${{ needs.qa-check.outputs.failure_message }}
