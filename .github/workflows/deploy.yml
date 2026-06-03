@@ -49,20 +49,25 @@ jobs:
             echo "$PR_BODY"
             echo "-------------------------"
 
-            FIRST_GTMETRIX=$(echo "$PR_BODY" \
-              | awk 'tolower($0) ~ /^## gtmetrix test urls?/{found=1; next} found && /https?:\/\//{match($0,/https?:\/\/[^ \t\r\n]+/); print substr($0,RSTART,RLENGTH); exit}' \
+            GTMETRIX_URLS=$(echo "$PR_BODY" \
+              | awk 'tolower($0) ~ /^## gtmetrix test urls?/{found=1; next} found && /https?:\/\//{match($0,/https?:\/\/[^ \t\r\n]+/); print substr($0,RSTART,RLENGTH)} found && !/https?:\/\// && /^##/{exit}' \
               | tr -d '\r')
 
             FIRST_ISSUE=$(echo "$PR_BODY" \
               | awk 'tolower($0) ~ /^## issue[[:space:]]*$/{found=1; next} found && /https?:\/\//{match($0,/https?:\/\/[^ \t\r\n]+/); print substr($0,RSTART,RLENGTH); exit}' \
               | tr -d '\r')
 
-            if [ -n "$FIRST_GTMETRIX" ]; then
-              echo "---- GTmetrix URL ----"
-              echo "$FIRST_GTMETRIX"
-              echo "gtmetrix_url=${FIRST_GTMETRIX}" >> "$GITHUB_OUTPUT"
+            if [ -n "$GTMETRIX_URLS" ]; then
+              echo "---- GTmetrix URLs ----"
+              echo "$GTMETRIX_URLS"
+              DELIMITER="GTMETRIX_$(openssl rand -hex 8)"
+              {
+                echo "gtmetrix_url<<$DELIMITER"
+                echo "$GTMETRIX_URLS"
+                echo "$DELIMITER"
+              } >> "$GITHUB_OUTPUT"
             else
-              echo "No GTmetrix URL found in PR body."
+              echo "No GTmetrix URLs found in PR body."
             fi
 
             if [ -n "$FIRST_ISSUE" ]; then
