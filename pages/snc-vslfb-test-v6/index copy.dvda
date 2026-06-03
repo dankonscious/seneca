@@ -29,11 +29,7 @@
     });
   </script>
   <script src="https://fast.wistia.com/assets/external/E-v1.js" async></script>
-<<<<<<< HEAD
-</head> 
-=======
 </head>
->>>>>>> parent of bf8a2b1 (a)
 
 <body class=" enc-overflow-x-hidden ">
   <section class="section-hero-video">
