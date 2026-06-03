@@ -24,7 +24,10 @@ jobs:
     uses: EnclaveLLC/automation-workflow/.github/workflows/ftp_deploy.yml@main
     permissions:
       contents: write
-    secrets: inherit
+    secrets:
+      FTP_SERVER: ${{ secrets.FTP_SERVER }}
+      FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+      FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
 
   # ---------------------------------------------------------------------------
   # Job 1b: Deploy to AWS (runs in parallel with deploy-ftp)
