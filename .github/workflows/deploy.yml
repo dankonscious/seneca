@@ -104,7 +104,7 @@ jobs:
     name: GTmetrix Check
     needs: [deploy-ftp, deploy-aws, pr-info]
     if: needs.pr-info.outputs.gtmetrix_url != ''
-    uses: EnclaveLLC/automation-workflow/.github/workflows/gtmetrix.yml
+    uses: EnclaveLLC/automation-workflow/.github/workflows/gtmetrix.yml@main
     with:
       gtmetrix_url: ${{ needs.pr-info.outputs.gtmetrix_url }}
       issue_url: ${{ needs.pr-info.outputs.issue_url }}
