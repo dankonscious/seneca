@@ -25,7 +25,7 @@
           scriptLoader.loadGTM('GTM-56TX85F'),
           scriptLoader.loadGA(['AW-770742054']),
         ]);
-      } 
+      }    
     }); 
   </script> 
   <script src="https://fast.wistia.com/assets/external/E-v1.js" async></script>
