@@ -5,7 +5,7 @@
 #
 # Note: target workflows must declare `on: workflow_call` to be callable here.
 # -----------------------------------------------------------------------------
-name: Standard Workflow Router
+name: Standard Workflow
 
 on:
   issues:
