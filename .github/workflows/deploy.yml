@@ -63,3 +63,5 @@ jobs:
       contents: write
     with:
       message: ${{ needs.qa-check.outputs.failure_message }}
+    secrets:
+      SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
