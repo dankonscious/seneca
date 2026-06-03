@@ -25,8 +25,12 @@ jobs:
     permissions:
       contents: read
       pull-requests: read
+    outputs:
+      gtmetrix_url: ${{ steps.extract.outputs.gtmetrix_url }}
+      issue_url: ${{ steps.extract.outputs.issue_url }}
     steps:
       - name: Fetch PR body if push is from a merged PR
+        id: extract
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -39,10 +43,32 @@ jobs:
             echo "This push was not associated with a pull request."
           else
             PR_NUMBER=$(echo "$PR_DATA" | jq -r '.number')
-            PR_BODY=$(echo "$PR_DATA" | jq -r '.body // "(no body)"')
+            PR_BODY=$(echo "$PR_DATA" | jq -r '.body // ""')
             echo "Push originated from PR #${PR_NUMBER}"
             echo "-------- PR Body --------"
             echo "$PR_BODY"
+            echo "-------------------------"
+
+            GTMETRIX_LINKS=$(echo "$PR_BODY" | grep -oE 'https?://gtmetrix\.com/[^ )>\n]+' || true)
+            ISSUE_LINKS=$(echo "$PR_BODY" | grep -oE 'https?://[^ )>\n]*(github\.com[^ )>\n]*/issues/[0-9]+|linear\.app[^ )>\n]+|jira[^ )>\n]+|atlassian\.net[^ )>\n]+)' || true)
+
+            if [ -n "$GTMETRIX_LINKS" ]; then
+              echo "---- GTmetrix Links ----"
+              echo "$GTMETRIX_LINKS"
+              FIRST_GTMETRIX=$(echo "$GTMETRIX_LINKS" | head -n1)
+              echo "gtmetrix_url=${FIRST_GTMETRIX}" >> "$GITHUB_OUTPUT"
+            else
+              echo "No GTmetrix links found in PR body."
+            fi
+
+            if [ -n "$ISSUE_LINKS" ]; then
+              echo "----- Issue Links ------"
+              echo "$ISSUE_LINKS"
+              FIRST_ISSUE=$(echo "$ISSUE_LINKS" | head -n1)
+              echo "issue_url=${FIRST_ISSUE}" >> "$GITHUB_OUTPUT"
+            else
+              echo "No issue links found in PR body."
+            fi
             echo "-------------------------"
           fi
 
@@ -72,7 +98,21 @@ jobs:
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
   # ---------------------------------------------------------------------------
-  # Job 2: QA Validation (runs after both deploys complete)
+  # Job 2: GTmetrix performance check (runs after both deploys complete)
+  # ---------------------------------------------------------------------------
+  gtmetrix:
+    name: GTmetrix Check
+    needs: [deploy-ftp, deploy-aws, pr-info]
+    if: needs.pr-info.outputs.gtmetrix_url != ''
+    uses: EnclaveLLC/automation-workflow/.github/workflows/gtmetrix.yml
+    with:
+      gtmetrix_url: ${{ needs.pr-info.outputs.gtmetrix_url }}
+      issue_url: ${{ needs.pr-info.outputs.issue_url }}
+    secrets:
+      GTMETRIX_API_KEY: ${{ secrets.GTMETRIX_API_KEY }}
+
+  # ---------------------------------------------------------------------------
+  # Job 4: QA Validation (runs after both deploys complete)
   # ---------------------------------------------------------------------------
   qa-check:
     name: QA Validation
@@ -82,7 +122,7 @@ jobs:
       contents: read
 
   # ---------------------------------------------------------------------------
-  # Job 3: Notify Slack if QA failed
+  # Job 5: Notify Slack if QA failed
   # ---------------------------------------------------------------------------
   notify-failure:
     name: Notify Slack on Failure
