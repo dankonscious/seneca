@@ -49,25 +49,28 @@ jobs:
             echo "$PR_BODY"
             echo "-------------------------"
 
-            GTMETRIX_LINKS=$(echo "$PR_BODY" | grep -oE 'https?://gtmetrix\.com/[^ )>\n]+' || true)
-            ISSUE_LINKS=$(echo "$PR_BODY" | grep -oE 'https?://[^ )>\n]*(github\.com[^ )>\n]*/issues/[0-9]+|linear\.app[^ )>\n]+|jira[^ )>\n]+|atlassian\.net[^ )>\n]+)' || true)
+            FIRST_GTMETRIX=$(echo "$PR_BODY" \
+              | awk 'tolower($0) ~ /^## gtmetrix test urls?/{found=1; next} found && /https?:\/\//{match($0,/https?:\/\/[^ \t\r\n]+/); print substr($0,RSTART,RLENGTH); exit}' \
+              | tr -d '\r')
 
-            if [ -n "$GTMETRIX_LINKS" ]; then
-              echo "---- GTmetrix Links ----"
-              echo "$GTMETRIX_LINKS"
-              FIRST_GTMETRIX=$(echo "$GTMETRIX_LINKS" | head -n1)
+            FIRST_ISSUE=$(echo "$PR_BODY" \
+              | awk 'tolower($0) ~ /^## issue[[:space:]]*$/{found=1; next} found && /https?:\/\//{match($0,/https?:\/\/[^ \t\r\n]+/); print substr($0,RSTART,RLENGTH); exit}' \
+              | tr -d '\r')
+
+            if [ -n "$FIRST_GTMETRIX" ]; then
+              echo "---- GTmetrix URL ----"
+              echo "$FIRST_GTMETRIX"
               echo "gtmetrix_url=${FIRST_GTMETRIX}" >> "$GITHUB_OUTPUT"
             else
-              echo "No GTmetrix links found in PR body."
+              echo "No GTmetrix URL found in PR body."
             fi
 
-            if [ -n "$ISSUE_LINKS" ]; then
-              echo "----- Issue Links ------"
-              echo "$ISSUE_LINKS"
-              FIRST_ISSUE=$(echo "$ISSUE_LINKS" | head -n1)
+            if [ -n "$FIRST_ISSUE" ]; then
+              echo "----- Issue URL ------"
+              echo "$FIRST_ISSUE"
               echo "issue_url=${FIRST_ISSUE}" >> "$GITHUB_OUTPUT"
             else
-              echo "No issue links found in PR body."
+              echo "No issue URL found in PR body."
             fi
             echo "-------------------------"
           fi
