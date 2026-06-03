@@ -37,6 +37,9 @@ jobs:
     uses: EnclaveLLC/automation-workflow/.github/workflows/aws_deploy.yml@main
     permissions:
       contents: write
+    secrets:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
   # ---------------------------------------------------------------------------
   # Job 2: QA Validation (runs after both deploys complete)
