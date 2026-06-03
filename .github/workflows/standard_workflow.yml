@@ -14,6 +14,7 @@ on:
 jobs:
 
     page-duplicate:
+        name: Page Duplicate
         if: github.event.label.name == 'Page Duplicate'
         uses: EnclaveLLC/automation-workflow/.github/workflows/page_duplicate.yml@main
         with:
