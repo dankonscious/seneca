@@ -12,7 +12,7 @@ on:
 
 jobs:
   claude:
-    uses: dankonscious/automation-workflow/.github/workflows/claude.yml@main
+    uses: EnclaveLLC/automation-workflow/.github/workflows/claude.yml@main
     permissions:
       actions: read
       contents: read
