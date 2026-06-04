@@ -3,8 +3,10 @@
 # Steps:
 #   1a. FTP deploy     ─┐ parallel
 #   1b. AWS deploy     ─┘
-#   2.  QA check on the recently committed folder
-#   3.  If QA fails → notify Slack
+#   2.  PR Info (runs after both deploys)
+#   3a. GTmetrix check ─┐ parallel (after PR Info)
+#   3b. QA check       ─┘
+#   4.  If QA fails → notify Slack
 # -----------------------------------------------------------------------------
 name: Deploy
 
@@ -17,10 +19,36 @@ on:
 jobs:
 
   # ---------------------------------------------------------------------------
-  # Job 0: Detect if push originated from a merged PR and echo its body
+  # Job 1a: Deploy via FTP
   # ---------------------------------------------------------------------------
-  pr-info:
-    name: PR Info
+  deploy-ftp:
+    name: FTP Deploy
+    uses: EnclaveLLC/automation-workflow/.github/workflows/ftp_deploy.yml@main
+    permissions:
+      contents: write
+    secrets:
+      FTP_SERVER: ${{ secrets.FTP_SERVER }}
+      FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+      FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+
+  # ---------------------------------------------------------------------------
+  # Job 1b: Deploy to AWS (runs in parallel with deploy-ftp)
+  # ---------------------------------------------------------------------------
+  deploy-aws:
+    name: AWS Deploy
+    uses: EnclaveLLC/automation-workflow/.github/workflows/aws_deploy.yml@main
+    permissions:
+      contents: write
+    secrets:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+  # ---------------------------------------------------------------------------
+  # Job 2: Detect if push originated from a merged PR and echo its body
+  # ---------------------------------------------------------------------------
+  fetching-info:
+    name: Fetch Info
+    needs: [deploy-ftp, deploy-aws]
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -81,37 +109,12 @@ jobs:
           fi
 
   # ---------------------------------------------------------------------------
-  # Job 1a: Deploy via FTP
-  # ---------------------------------------------------------------------------
-  deploy-ftp:
-    name: FTP Deploy
-    uses: EnclaveLLC/automation-workflow/.github/workflows/ftp_deploy.yml@main
-    permissions:
-      contents: write
-    secrets:
-      FTP_SERVER: ${{ secrets.FTP_SERVER }}
-      FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
-      FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
-
-  # ---------------------------------------------------------------------------
-  # Job 1b: Deploy to AWS (runs in parallel with deploy-ftp)
-  # ---------------------------------------------------------------------------
-  deploy-aws:
-    name: AWS Deploy
-    uses: EnclaveLLC/automation-workflow/.github/workflows/aws_deploy.yml@main
-    permissions:
-      contents: write
-    secrets:
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
-  # ---------------------------------------------------------------------------
-  # Job 2: GTmetrix performance check (runs after both deploys complete)
+  # Job 3a: GTmetrix performance check (runs after PR Info)
   # ---------------------------------------------------------------------------
   gtmetrix:
     name: GTmetrix Check
-    needs: [deploy-ftp, deploy-aws, pr-info]
-    if: needs.pr-info.outputs.gtmetrix_url != '' && needs.pr-info.outputs.issue_url != ''
+    needs: [fetching-info]
+    if: needs.fetching-info.outputs.gtmetrix_url != '' && needs.fetching-info.outputs.issue_url != ''
     permissions:
       actions: read
       contents: write
@@ -120,18 +123,20 @@ jobs:
       id-token: write
     uses: EnclaveLLC/automation-workflow/.github/workflows/gtmetrix.yml@main
     with:
-      gtmetrix_url: ${{ needs.pr-info.outputs.gtmetrix_url }}
-      issue_url: ${{ needs.pr-info.outputs.issue_url }}
+      gtmetrix_url: ${{ needs.fetching-info.outputs.gtmetrix_url }}
+      issue_url: ${{ needs.fetching-info.outputs.issue_url }}
     secrets:
       GTMETRIX_API_KEY: ${{ secrets.GTMETRIX_API_KEY }}
 
   # ---------------------------------------------------------------------------
-  # Job 4: QA Validation (runs after both deploys complete)
+  # Job 3b: QA Validation (runs after PR Info)
   # ---------------------------------------------------------------------------
   qa-check:
     name: QA Validation
-    needs: [deploy-ftp, deploy-aws]
+    needs: [fetching-info]
     uses: EnclaveLLC/automation-workflow/.github/workflows/qa_check.yml@main
+    with:
+      issue_url: ${{ needs.fetching-info.outputs.issue_url }}
     permissions:
       contents: read
 
