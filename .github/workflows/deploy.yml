@@ -15,7 +15,7 @@ jobs:
     uses: EnclaveLLC/automation-workflow/.github/workflows/deploy.yml@main
     permissions:
       actions: read
-      contents: write
+      contents: write 
       issues: write
       pull-requests: read
       id-token: write
