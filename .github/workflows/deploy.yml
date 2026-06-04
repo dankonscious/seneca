@@ -10,23 +10,6 @@ on:
       - master
 
 jobs:
-  # ---------------------------------------------------------------------------
-  # Job 0: Verify secrets are passed correctly (temporary debug job)
-  # ---------------------------------------------------------------------------
-  debug-secrets:
-    name: Debug Secrets
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check secrets presence
-        run: |
-          echo "FTP_SERVER:          ${{ secrets.FTP_SERVER != '' && '✅ set' || '❌ missing' }}"
-          echo "FTP_USERNAME:        ${{ secrets.FTP_USERNAME != '' && '✅ set' || '❌ missing' }}"
-          echo "FTP_PASSWORD:        ${{ secrets.FTP_PASSWORD != '' && '✅ set' || '❌ missing' }}"
-          echo "AWS_ACCESS_KEY_ID:   ${{ secrets.AWS_ACCESS_KEY_ID != '' && '✅ set' || '❌ missing' }}"
-          echo "AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY != '' && '✅ set' || '❌ missing' }}"
-          echo "GTMETRIX_API_KEY:    ${{ secrets.GTMETRIX_API_KEY != '' && '✅ set' || '❌ missing' }}"
-          echo "SLACK_BOT_TOKEN:     ${{ secrets.SLACK_BOT_TOKEN != '' && '✅ set' || '❌ missing' }}"
-
   deploy-ftp:
     name: Deploy
     uses: EnclaveLLC/automation-workflow/.github/workflows/deploy.yml@main
