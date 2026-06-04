@@ -9,7 +9,7 @@ name: Standard Workflow
 
 on:
   issues:
-    types: [labeled]
+    types: [labeled, edited]
 
 jobs:
 
