@@ -11,6 +11,10 @@ on:
   issues:
     types: [labeled, edited]
 
+concurrency:
+  group: deploy-main
+  cancel-in-progress: false
+
 jobs:
 
     page-duplicate:
