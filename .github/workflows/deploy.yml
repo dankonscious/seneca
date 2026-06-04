@@ -9,6 +9,10 @@ on:
       - main
       - master
 
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   deploy-ftp:
     name: Deploy
