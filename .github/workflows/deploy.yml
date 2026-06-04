@@ -4,19 +4,21 @@
 name: Deploy
 
 on:
-  push:
+  pull_request:
+    types: [closed]
     branches:
       - main
       - master
 
-concurrency:
-  group: deploy-${{ github.ref }}
-  cancel-in-progress: false
-
 jobs:
   deploy-ftp:
     name: Deploy
+    if: github.event.pull_request.merged == true
     uses: EnclaveLLC/automation-workflow/.github/workflows/deploy.yml@main
+    with:
+      pr_number: ${{ github.event.pull_request.number }}
+      pr_title: ${{ github.event.pull_request.title }}
+      pr_body: ${{ github.event.pull_request.body }}
     permissions:
       actions: read
       contents: write
