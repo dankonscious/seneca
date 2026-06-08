@@ -1,10 +1,3 @@
-# -----------------------------------------------------------------------------
-# Workflow: Standard Issue Label Router
-# Triggers on issue label events and dispatches to the corresponding
-# reusable workflow in EnclaveLLC/automation-workflow.
-#
-# Note: target workflows must declare `on: workflow_call` to be callable here.
-# -----------------------------------------------------------------------------
 name: Standard Workflow
 
 on:
@@ -17,47 +10,11 @@ concurrency:
 
 jobs:
 
-    page-duplicate:
-        name: Page Duplicate
-        if: github.event.label.name == 'Page Duplicate'
-        uses: EnclaveLLC/automation-workflow/.github/workflows/page_duplicate.yml@main
+    dispatch:
+        uses: EnclaveLLC/automation-workflow/.github/workflows/standard_workflow.yml@main
         with:
+            label_name: ${{ github.event.label.name }}
             issue_number: ${{ github.event.issue.number }}
-        secrets: inherit
-        permissions:
-            contents: write
-            issues: write
-            pull-requests: write
-    
-    new-page:
-        if: github.event.label.name == 'New Page'
-        uses: EnclaveLLC/automation-workflow/.github/workflows/new-page.yml@main
-        with:
-            issue_number: ${{ github.event.issue.number }}
-        secrets: inherit
-        permissions:
-            contents: write
-            issues: write
-            pull-requests: write
-            
-    split-test-on:
-        if: github.event.label.name == 'Split Test On'
-        uses: EnclaveLLC/automation-workflow/.github/workflows/split_test.yml@main
-        with:
-            issue_number: ${{ github.event.issue.number }}
-            type: "on"
-        secrets: inherit
-        permissions:
-            contents: write
-            issues: write
-            pull-requests: write
-
-    split-test-off:
-        if: github.event.label.name == 'Split Test Off'
-        uses: EnclaveLLC/automation-workflow/.github/workflows/split_test.yml@main
-        with:
-            issue_number: ${{ github.event.issue.number }}
-            type: "off"
         secrets: inherit
         permissions:
             contents: write
