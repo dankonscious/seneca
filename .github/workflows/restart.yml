@@ -5,6 +5,7 @@ on:
     types: [created]
 
 jobs:
+  name: Restart Workflow
   restart:
     if: contains(github.event.comment.body, '@restart')
     uses: EnclaveLLC/automation-workflow/.github/workflows/restart.yml@main
@@ -14,4 +15,6 @@ jobs:
     secrets: inherit
     permissions:
       actions: write
+      contents: write
       issues: write
+      pull-requests: write
