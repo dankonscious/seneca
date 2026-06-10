@@ -53,7 +53,7 @@ if (@$_GET["test"] != "false") {
   <h2>Replace my subheading</h2>
   <h3>Replace my sub-subheading</h3>
  
-  <img src="https://d3j6ngx7p7lglj.cloudfront.net/seneca/large-image.webp?v=1781106848291" alt="Large Image"/>
+  <img src="https://d3j6ngx7p7lglj.cloudfront.net/seneca/pages/snc-vslfb-test-v2/large-image.webp?v=1781106848291" alt="Large Image"/>
   
   <a href="https://go.gutperfection.com/products/seneca-1-pack-snc-test-v1#params">
     https://go.gutperfection.com/products/seneca-1-pack-snc-test-v1
