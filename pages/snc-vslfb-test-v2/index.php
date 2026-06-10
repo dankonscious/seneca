@@ -1,4 +1,20 @@
+<?php
+if (@$_GET["test"] != "false") {
+  $qs = ($_SERVER["QUERY_STRING"] ? "?" : "") . $_SERVER["QUERY_STRING"];
 
+  require_once("../../splittester/splittester.class.php");
+
+  $urls = array(
+    "pages/snc-vslfb-test$qs",
+    "http://senecahealthads.com/pages/snc-vslfb-test-dup$qs",
+    "https://senecahealthads.com/pages/snc-vslfb-test-v1$qs",
+    "https://senecahealthads.com/pages/snc-vslfb-test-v2$qs",
+    "https://senecahealthads.com/pages/snc-vslfb-test-v3$qs"
+  );
+
+  $split = new SplitTester($urls);
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -37,23 +53,18 @@
   <h2>Replace my subheading</h2>
   <h3>Replace my sub-subheading</h3>
  
-<<<<<<< HEAD
-  <img src="/large-image.webp" alt="Large Image"/>
-
-=======
   <img src="https://d3j6ngx7p7lglj.cloudfront.net/seneca/large-image.webp?v=1781106848291" alt="Large Image"/>
   
->>>>>>> 59a219511a8f45b54d557c52ea27d886d60fef44
-  <a href="https://go.gutperfection.com/products/seneca-1-pack-snc-vslyt#params">
-    https://go.gutperfection.com/products/seneca-1-pack-snc-vslyt
+  <a href="https://go.gutperfection.com/products/seneca-1-pack-snc-test-v1#params">
+    https://go.gutperfection.com/products/seneca-1-pack-snc-test-v1
   </a>
   
-  <a href="https://go.gutperfection.com/products/seneca-3-pack-snc-vslyt#params">
-    https://go.gutperfection.com/products/seneca-3-pack-snc-vslyt
+  <a href="https://go.gutperfection.com/products/seneca-3-pack-snc-test-v1#params">
+    https://go.gutperfection.com/products/seneca-3-pack-snc-test-v1
   </a>
 
-  <a href="https://go.gutperfection.com/products/seneca-6-pack-snc-vslyt#params">
-    https://go.gutperfection.com/products/seneca-6-pack-snc-vslyt
+  <a href="https://go.gutperfection.com/products/seneca-6-pack-snc-test-v1#params">
+    https://go.gutperfection.com/products/seneca-6-pack-snc-test-v1
   </a>
 </body>
 
