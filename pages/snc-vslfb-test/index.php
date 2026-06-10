@@ -1,20 +1,4 @@
-<?php
-if (@$_GET["test"] != "false") {
-  $qs = ($_SERVER["QUERY_STRING"] ? "?" : "") . $_SERVER["QUERY_STRING"];
 
-  require_once("../../splittester/splittester.class.php");
-
-  $urls = array(
-    "pages/snc-vslfb-test$qs",
-    "http://senecahealthads.com/pages/snc-vslfb-test-dup$qs",
-    "https://senecahealthads.com/pages/snc-vslfb-test-v1$qs",
-    "https://senecahealthads.com/pages/snc-vslfb-test-v2$qs",
-    "https://senecahealthads.com/pages/snc-vslfb-test-v3$qs"
-  );
-
-  $split = new SplitTester($urls);
-}
-?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -54,7 +38,7 @@ if (@$_GET["test"] != "false") {
   <h3>Replace my sub-subheading</h3>
  
   <img src="/large-image.webp" alt="Large Image"/>
-  
+
   <a href="https://go.gutperfection.com/products/seneca-1-pack-snc-vslyt#params">
     https://go.gutperfection.com/products/seneca-1-pack-snc-vslyt
   </a>
