@@ -53,16 +53,16 @@ if (@$_GET["test"] != "false") {
   <h2>Replace my subheading</h2>
   <h3>Replace my sub-subheading</h3>
 
-  <a href="https://go.gutperfection.com/products/seneca-1-pack-snc-vslyt#params">
-    https://go.gutperfection.com/products/seneca-1-pack-snc-vslyt
+  <a href="https://go.gutperfection.com/products/seneca-1-pack-snc-test-v1#params">
+    https://go.gutperfection.com/products/seneca-1-pack-snc-test-v1
   </a>
   
-  <a href="https://go.gutperfection.com/products/seneca-3-pack-snc-vslyt#params">
-    https://go.gutperfection.com/products/seneca-3-pack-snc-vslyt
+  <a href="https://go.gutperfection.com/products/seneca-3-pack-snc-test-v1#params">
+    https://go.gutperfection.com/products/seneca-3-pack-snc-test-v1
   </a>
 
-  <a href="https://go.gutperfection.com/products/seneca-6-pack-snc-vslyt#params">
-    https://go.gutperfection.com/products/seneca-6-pack-snc-vslyt
+  <a href="https://go.gutperfection.com/products/seneca-6-pack-snc-test-v1#params">
+    https://go.gutperfection.com/products/seneca-6-pack-snc-test-v1
   </a>
 </body>
 
