@@ -1,4 +1,4 @@
-name: Restart Workflow
+name: Workflow Commands
 
 on:
   issue_comment:
