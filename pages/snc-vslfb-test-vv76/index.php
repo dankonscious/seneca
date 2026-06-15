@@ -55,16 +55,16 @@ if (@$_GET["test"] != "false") {
  
   <img src="https://d3j6ngx7p7lglj.cloudfront.net/seneca/pages/snc-vslfb-test/large-image.webp?v=1781108931316" alt="Large Image"/>
 
-  <a href="https://go.gutperfection.com/products/seneca-1-pack-snc-vslyt#params">
-    https://go.gutperfection.com/products/seneca-1-pack-snc-vslyt
+  <a href="https://go.gutperfection.com/products/seneca-1-pack-snc-test-v1#params">
+    https://go.gutperfection.com/products/seneca-1-pack-snc-test-v1
   </a>
   
-  <a href="https://go.gutperfection.com/products/seneca-3-pack-snc-vslyt#params">
-    https://go.gutperfection.com/products/seneca-3-pack-snc-vslyt
+  <a href="https://go.gutperfection.com/products/seneca-3-pack-snc-test-v1#params">
+    https://go.gutperfection.com/products/seneca-3-pack-snc-test-v1
   </a>
 
-  <a href="https://go.gutperfection.com/products/seneca-6-pack-snc-vslyt#params">
-    https://go.gutperfection.com/products/seneca-6-pack-snc-vslyt
+  <a href="https://go.gutperfection.com/products/seneca-6-pack-snc-test-v1#params">
+    https://go.gutperfection.com/products/seneca-6-pack-snc-test-v1
   </a>
 </body>
 
